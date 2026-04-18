@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>المارد الأزرق — يحزر قسمك</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#03050e;--blue:#2563ff;--glow:#4d9fff;--gold:#ffc94d;
+  --smoke:#a0b4d0;--card:#070c1a;--border:#0d1a35;--text:#c8d8f0;
+}
+html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+
+/* STARS */
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d) ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0.07;transform:scale(1)}50%{opacity:0.85;transform:scale(1.4)}}
+
+/* FOG */
+body::before{content:'';position:fixed;bottom:0;left:0;right:0;height:260px;background:radial-gradient(ellipse at 50% 100%,rgba(37,99,255,0.2) 0%,transparent 70%);pointer-events:none;z-index:1;}
+
+/* AMBIENT PARTICLES */
+.ap{position:fixed;pointer-events:none;z-index:1;border-radius:50%;animation:float-ap var(--dur) ease-in-out infinite;opacity:0;}
+@keyframes float-ap{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:.5}80%{opacity:.3}100%{opacity:0;transform:translateY(-130px) scale(1.3)}}
+
+/* LAMP */
+.lamp-scene{position:fixed;bottom:-6px;left:50%;transform:translateX(-50%);z-index:2;pointer-events:none;}
+.lamp{width:86px;height:52px;background:linear-gradient(135deg,#7a5800,#ffd700,#b8860b,#ffd700,#7a5800);border-radius:50% 50% 35% 35%;position:relative;box-shadow:0 0 40px rgba(255,201,77,.5),0 0 80px rgba(255,201,77,.2);}
+.lamp::before{content:'';position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:13px;height:19px;background:linear-gradient(#ffd700,#b8860b);border-radius:5px 5px 0 0;}
+.lamp-smoke{position:absolute;bottom:46px;left:50%;transform:translateX(-50%);width:6px;height:80px;background:linear-gradient(to top,rgba(77,159,255,.9),rgba(168,85,247,.4),transparent);border-radius:6px;animation:smoke 2.5s ease-in-out infinite;filter:blur(4px);}
+@keyframes smoke{0%,100%{transform:translateX(-50%) scaleX(1);height:80px;opacity:.8}50%{transform:translateX(-48%) scaleX(2.2);height:110px;opacity:.45}}
+
+/* MUSIC BUTTON */
+.music-btn{position:fixed;top:14px;right:14px;z-index:200;background:rgba(7,12,26,.9);border:1px solid rgba(77,159,255,.35);border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;transition:all .3s;backdrop-filter:blur(8px);}
+.music-btn:hover{border-color:var(--blue);box-shadow:0 0 20px rgba(37,99,255,.4);}
+
+/* QR BUTTON */
+.qr-fab{position:fixed;top:14px;left:14px;z-index:200;background:rgba(7,12,26,.9);border:1px solid rgba(77,159,255,.3);border-radius:50%;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;transition:all .3s;backdrop-filter:blur(8px);}
+.qr-fab:hover{border-color:var(--blue);box-shadow:0 0 20px rgba(37,99,255,.35);}
+
+/* QR MODAL */
+.qr-modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:20px;}
+.qr-modal.open{display:flex;}
+.qr-box{background:var(--card);border:1px solid rgba(77,159,255,.3);border-radius:24px;padding:28px 24px;text-align:center;max-width:300px;width:100%;box-shadow:0 0 80px rgba(37,99,255,.2);animation:modal-in .35s cubic-bezier(.34,1.3,.64,1) both;}
+@keyframes modal-in{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.qr-box h3{font-size:17px;font-weight:700;color:#fff;margin-bottom:5px;direction:rtl;}
+.qr-box p{font-size:12px;color:var(--smoke);margin-bottom:16px;direction:rtl;}
+#qrcode{display:flex;justify-content:center;background:#fff;border-radius:10px;padding:10px;margin:0 auto 16px;width:fit-content;}
+.qr-close{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;padding:11px 32px;border-radius:50px;cursor:pointer;transition:all .3s;}
+
+/* CONTAINER */
+.container{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 110px;max-width:480px;margin:0 auto;}
+
+/* ======== INTRO ======== */
+#screen-intro{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;padding-top:12px;}
+.genie-avatar{font-size:88px;line-height:1;margin-bottom:6px;animation:float 3.5s ease-in-out infinite;filter:drop-shadow(0 0 28px rgba(77,159,255,.75));}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-15px) rotate(2deg)}}
+.genie-title{font-family:'Cinzel',serif;font-size:clamp(26px,7vw,38px);font-weight:900;color:#fff;letter-spacing:.06em;text-shadow:0 0 40px rgba(77,159,255,.8),0 0 80px rgba(77,159,255,.3);margin-bottom:3px;}
+.genie-sub{font-size:11px;color:var(--gold);letter-spacing:.25em;margin-bottom:18px;font-weight:300;}
+.speech-bubble{background:var(--card);border:1px solid rgba(77,159,255,.2);border-radius:18px 18px 18px 4px;padding:16px 18px;position:relative;width:100%;margin-bottom:18px;box-shadow:0 0 40px rgba(37,99,255,.07);}
+.speech-bubble::before{content:'';position:absolute;bottom:-10px;right:18px;width:0;height:0;border-left:10px solid transparent;border-top:10px solid rgba(77,159,255,.2);}
+.speech-bubble p{font-size:clamp(14px,3.5vw,16px);line-height:1.9;direction:rtl;color:var(--text);}
+.speech-bubble p span{color:var(--gold);font-weight:700;}
+.dept-preview{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:22px;}
+.dept-chip{background:var(--card);border:1px solid var(--border);padding:9px 12px;border-radius:12px;font-size:12px;direction:rtl;display:flex;align-items:center;gap:7px;color:var(--smoke);transition:all .3s;}
+.dept-chip:hover{border-color:var(--blue);color:#fff;}
+.start-btn{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:18px;font-weight:700;padding:16px 0;border-radius:50px;cursor:pointer;box-shadow:0 0 40px rgba(37,99,255,.45);transition:all .3s;width:100%;max-width:280px;position:relative;overflow:hidden;}
+.start-btn::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,rgba(255,255,255,.09),transparent);animation:shine 3s ease-in-out infinite;}
+@keyframes shine{0%{transform:translateX(-100%) rotate(45deg)}60%,100%{transform:translateX(100%) rotate(45deg)}}
+.start-btn:hover{transform:scale(1.04);box-shadow:0 0 60px rgba(37,99,255,.65);}
+.start-btn:active{transform:scale(.97);}
+
+/* ======== GAME ======== */
+#screen-game{display:none;width:100%;}
+.progress-bar-wrap{width:100%;height:5px;background:var(--border);border-radius:5px;margin-bottom:18px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--glow),var(--gold));background-size:200%;border-radius:5px;transition:width .6s ease;box-shadow:0 0 10px rgba(77,159,255,.6);animation:bar-sh 2s linear infinite;}
+@keyframes bar-sh{0%{background-position:0%}100%{background-position:200%}}
+.question-card{background:var(--card);border:1px solid rgba(77,159,255,.18);border-radius:22px;padding:22px 16px 18px;margin-bottom:14px;box-shadow:0 0 50px rgba(37,99,255,.07),inset 0 1px 0 rgba(255,255,255,.025);animation:card-in .38s cubic-bezier(.34,1.2,.64,1) both;}
+@keyframes card-in{from{opacity:0;transform:translateY(22px) scale(.94)}to{opacity:1;transform:none}}
+.genie-think{font-size:44px;text-align:center;margin-bottom:10px;animation:float 2.5s ease-in-out infinite;filter:drop-shadow(0 0 14px rgba(77,159,255,.6));}
+.q-num{font-size:10px;color:var(--blue);letter-spacing:.18em;text-align:center;margin-bottom:10px;font-weight:700;}
+.question-text{font-size:clamp(16px,4vw,20px);font-weight:700;text-align:center;direction:rtl;line-height:1.7;color:#fff;margin-bottom:20px;}
+.answers{display:flex;flex-direction:column;gap:9px;}
+.ans-btn{background:rgba(255,255,255,.025);border:1.5px solid var(--border);color:var(--text);font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;padding:13px 14px;border-radius:13px;cursor:pointer;transition:all .22s;direction:rtl;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;text-align:right;width:100%;}
+.ans-btn:active{transform:scale(.97);}
+.ans-btn.o1{border-color:rgba(34,197,94,.25);}   .ans-btn.o1:hover,.ans-btn.o1.sel{border-color:#22c55e;background:rgba(34,197,94,.1);color:#fff;}
+.ans-btn.o2{border-color:rgba(77,159,255,.25);}   .ans-btn.o2:hover,.ans-btn.o2.sel{border-color:var(--glow);background:rgba(77,159,255,.1);color:#fff;}
+.ans-btn.o3{border-color:rgba(245,158,11,.25);}   .ans-btn.o3:hover,.ans-btn.o3.sel{border-color:#f59e0b;background:rgba(245,158,11,.1);color:#fff;}
+.ans-btn.o4{border-color:rgba(168,85,247,.25);}   .ans-btn.o4:hover,.ans-btn.o4.sel{border-color:#a855f7;background:rgba(168,85,247,.1);color:#fff;}
+.ans-icon{font-size:18px;flex-shrink:0;}
+
+/* THINKING */
+.thinking-wrap{display:flex;flex-direction:column;align-items:center;padding:28px 20px;gap:12px;}
+.thinking-genie{font-size:48px;animation:wobble .5s ease-in-out infinite alternate;}
+@keyframes wobble{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.thinking-dots{display:flex;gap:8px;}
+.thinking-dots span{width:8px;height:8px;background:var(--blue);border-radius:50%;animation:dot-b .8s ease-in-out infinite;}
+.thinking-dots span:nth-child(2){animation-delay:.15s;}
+.thinking-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes dot-b{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.thinking-text{font-size:13px;color:var(--blue);letter-spacing:.12em;animation:pulse-t 1s ease-in-out infinite;}
+@keyframes pulse-t{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ======== RESULT ======== */
+#screen-result{display:none;width:100%;text-align:center;}
+.result-genie{font-size:76px;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(77,159,255,.8));margin-bottom:10px;}
+.result-label{font-size:11px;letter-spacing:.28em;color:var(--blue);margin-bottom:8px;}
+.dept-icon-big{font-size:60px;margin-bottom:8px;filter:drop-shadow(0 0 22px rgba(77,159,255,.6));animation:float 3.5s ease-in-out infinite;}
+.result-dept{font-size:clamp(20px,6vw,32px);font-weight:900;color:#fff;direction:rtl;margin-bottom:3px;line-height:1.2;text-shadow:0 0 30px rgba(77,159,255,.4);}
+.result-dept-en{font-size:12px;color:var(--gold);letter-spacing:.1em;margin-bottom:20px;}
+.result-card{background:var(--card);border:1px solid rgba(77,159,255,.18);border-radius:20px;padding:20px 16px;margin-bottom:14px;text-align:right;box-shadow:0 0 50px rgba(37,99,255,.07);animation:card-in .5s cubic-bezier(.34,1.3,.64,1) both;}
+.result-speech{font-size:clamp(14px,3.5vw,16px);line-height:1.9;color:var(--text);direction:rtl;}
+.result-speech .hl{color:var(--gold);font-weight:700;}
+.confidence-wrap{display:flex;align-items:center;gap:10px;direction:rtl;margin-top:14px;}
+.confidence-label{font-size:11px;color:var(--smoke);white-space:nowrap;}
+.confidence-bar{flex:1;height:7px;background:var(--border);border-radius:7px;overflow:hidden;}
+.confidence-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--glow),var(--gold));border-radius:7px;width:0;transition:width 1.4s cubic-bezier(.22,1,.36,1);box-shadow:0 0 10px rgba(77,159,255,.6);}
+.confidence-pct{font-size:12px;color:var(--glow);font-weight:700;white-space:nowrap;}
+.wrong-btn{background:transparent;border:1.5px solid rgba(239,68,68,.3);color:rgba(239,68,68,.75);font-family:'Tajawal',sans-serif;font-size:14px;padding:10px 0;border-radius:50px;cursor:pointer;transition:all .3s;margin-bottom:10px;width:100%;}
+.wrong-btn:hover{border-color:#ef4444;color:#ef4444;}
+.replay-btn{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;padding:14px 0;border-radius:50px;cursor:pointer;box-shadow:0 0 30px rgba(37,99,255,.3);transition:all .3s;width:100%;}
+.replay-btn:hover{transform:scale(1.03);}
+.replay-btn:active{transform:scale(.97);}
+
+/* ======== WRONG ======== */
+#screen-wrong{display:none;width:100%;text-align:center;}
+.wrong-genie{font-size:66px;margin-bottom:12px;animation:shake .5s ease both;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+.dept-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0;}
+.dept-choice-btn{background:var(--card);border:1.5px solid var(--border);color:var(--text);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;padding:14px 10px;border-radius:14px;cursor:pointer;direction:rtl;transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.dept-choice-btn:hover{border-color:var(--gold);color:var(--gold);transform:scale(1.04);}
+.dept-choice-btn .d-icon{font-size:24px;}
+.dept-choice-btn .d-name{font-size:12px;line-height:1.4;text-align:center;}
+
+/* PARTICLES */
+.burst{position:fixed;inset:0;pointer-events:none;z-index:100;}
+.particle{position:absolute;width:7px;height:7px;border-radius:50%;animation:burst-fly 1.2s cubic-bezier(.2,.8,.3,1) forwards;}
+@keyframes burst-fly{0%{transform:translate(0,0) scale(1.5);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
+
+/* RIPPLE */
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.15);transform:scale(0);animation:ripple-a .5s ease-out;pointer-events:none;}
+@keyframes ripple-a{to{transform:scale(4);opacity:0}}
+
+.fade-in{animation:fadeIn .5s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+@media(max-width:380px){
+  .container{padding:14px 12px 90px;}
+  .question-card{padding:18px 12px 14px;}
+  .ans-btn{font-size:14px;padding:12px 12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="lamp-scene"><div class="lamp-smoke"></div><div class="lamp"></div></div>
+
+<!-- Music Toggle -->
+<button class="music-btn" id="music-btn" onclick="toggleMusic()" title="تشغيل/إيقاف الموسيقى">🔊</button>
+
+<!-- QR Button -->
+<button class="qr-fab" onclick="openQR()" title="QR الموقع">📲</button>
+
+<!-- QR Modal -->
+<div class="qr-modal" id="qr-modal" onclick="closeQR(event)">
+  <div class="qr-box">
+    <h3>🧞 شارك الموقع</h3>
+    <p>امسح الكود بكاميرا الموبايل لفتح الموقع مباشرةً على GitHub</p>
+    <div id="qrcode"></div>
+    <button class="qr-close" onclick="closeQR()">إغلاق ✕</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- INTRO -->
+  <div id="screen-intro">
+    <div class="genie-avatar">🧞</div>
+    <div class="genie-title">المارد الأزرق</div>
+    <div class="genie-sub">GENIE OF KNOWLEDGE</div>
+    <div class="speech-bubble">
+      <p>
+        أنا المارد الأزرق، عشت <span>ألف سنة</span> بين أقسام كلية هندسة المعلومات...<br>
+        أجاوب على <span>7-12 سؤال عشوائي</span> — وأحزر قسمك بدقة تخليك تقول<br>"هذا يعرفني أكثر مني!" 😏
+      </p>
+    </div>
+    <div class="dept-preview">
+      <div class="dept-chip"><span>🔐</span> الأمن السيبراني</div>
+      <div class="dept-chip"><span>🤖</span> الأتمتة والذكاء الاصطناعي</div>
+      <div class="dept-chip"><span>🌐</span> هندسة الشبكات</div>
+      <div class="dept-chip"><span>📡</span> المعلومات والاتصالات</div>
+    </div>
+    <button class="start-btn" onclick="startGame()">🧞 اسأل المارد</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="screen-game">
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="prog-bar" style="width:0%"></div></div>
+    <div id="question-area"></div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result">
+    <div class="result-genie">🧞</div>
+    <div class="result-label fade-in">✨ كشفت سرك ✨</div>
+    <div class="dept-icon-big fade-in" id="res-icon"></div>
+    <div class="result-dept fade-in" id="res-name"></div>
+    <div class="result-dept-en fade-in" id="res-name-en"></div>
+    <div class="result-card fade-in">
+      <div class="result-speech" id="res-speech"></div>
+      <div class="confidence-wrap">
+        <span class="confidence-label">ثقة المارد:</span>
+        <div class="confidence-bar"><div class="confidence-fill" id="conf-fill"></div></div>
+        <span class="confidence-pct" id="conf-pct"></span>
+      </div>
+    </div>
+    <button class="wrong-btn" onclick="showWrong()">😅 غلطت! قسمي ثاني</button>
+    <button class="replay-btn" onclick="restart()">🔄 العب مرة ثانية</button>
+  </div>
+
+  <!-- WRONG -->
+  <div id="screen-wrong">
+    <div class="wrong-genie">😤</div>
+    <div style="font-size:19px;font-weight:900;color:#fff;margin-bottom:6px;direction:rtl">المارد يزيد الأسئلة... 🔍</div>
+    <div style="font-size:13px;color:var(--smoke);direction:rtl;margin-bottom:4px;">أو اخبرني: شنو قسمك الحقيقي؟</div>
+    <div class="dept-choices" id="dept-choices"></div>
+    <button class="replay-btn" onclick="continueGame()">🧞 اسألني أسئلة زيادة</button>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+//  STARS
+// ============================================================
+const starsEl=document.getElementById('stars');
+for(let i=0;i<90;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*2.4+.4;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*5}s;animation-delay:${Math.random()*5}s;`;
+  starsEl.appendChild(s);
+}
+
+// ============================================================
+//  AMBIENT PARTICLES
+// ============================================================
+function spawnAP(){
+  const p=document.createElement('div');p.className='ap';
+  const sz=Math.random()*4+2,left=Math.random()*100,dur=4+Math.random()*7;
+  const cols=['rgba(37,99,255,.55)','rgba(77,159,255,.45)','rgba(255,201,77,.38)','rgba(168,85,247,.38)'];
+  p.style.cssText=`width:${sz}px;height:${sz}px;left:${left}%;bottom:55px;--dur:${dur}s;background:${cols[0|Math.random()*4]};animation-delay:${Math.random()*2}s;filter:blur(1px)`;
+  document.body.appendChild(p);setTimeout(()=>p.remove(),(dur+3)*1000);
+}
+setInterval(spawnAP,1300);
+
+// ============================================================
+//  QR CODE
+// ============================================================
+let qrDone=false;
+function openQR(){
+  document.getElementById('qr-modal').classList.add('open');
+  if(!qrDone){
+    try{new QRCode(document.getElementById('qrcode'),{text:'https://your-username.github.io/genie',width:170,height:170,colorDark:'#04060f',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}
+    catch(e){document.getElementById('qrcode').innerHTML='<p style="padding:16px;color:#333;font-size:12px">افتح من متصفح الجهاز</p>';}
+    qrDone=true;
+  }
+}
+function closeQR(e){if(!e||e.target===document.getElementById('qr-modal')||e.currentTarget===e.target)document.getElementById('qr-modal').classList.remove('open');}
+
+// ============================================================
+//  MUSIC — Web Audio API "Arabian Nights" style loop
+// ============================================================
+let audioCtx=null,musicPlaying=false,musicNodes=[];
+
+function getCtx(){
+  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+
+/* Pentatonic + Arabic scale notes (Hz) */
+const SCALE=[
+  220,    // A3
+  246.94, // B3
+  261.63, // C4
+  293.66, // D4
+  329.63, // E4
+  349.23, // F4
+  392.00, // G4
+  440.00, // A4
+  493.88, // B4
+  523.25, // C5
+  587.33, // D5
+  659.25, // E5
+  698.46, // F5
+  783.99, // G5
+  880.00, // A5
+];
+
+/* Melody sequence — index into SCALE, duration in beats */
+const MELODY=[
+  [9,.5],[9,.25],[10,.25],[11,.5],[9,.5],
+  [11,.5],[11,.25],[12,.25],[11,.5],[9,.5],
+  [7,.5],[7,.25],[9,.25],[11,1],
+  [9,.5],[7,.5],[5,.5],[4,.5],
+  [5,.5],[5,.25],[7,.25],[9,.5],[7,.5],
+  [4,.5],[4,.25],[5,.25],[7,.5],[5,.5],
+  [2,.5],[4,.5],[5,.5],[7,.5],
+  [5,.5],[4,.5],[2,.5],[0,1],
+];
+const BASS=[
+  [0,1],[2,1],[4,1],[5,1],
+  [0,1],[2,1],[4,1],[7,1],
+];
+
+let melodyTimeout=null,bassTimeout=null;
+
+function playNote(freq,dur,gainVal,type,ctx,dest,when){
+  const osc=ctx.createOscillator();
+  const g=ctx.createGain();
+  const filter=ctx.createBiquadFilter();
+  filter.type='lowpass';filter.frequency.value=3000;
+  osc.connect(filter);filter.connect(g);g.connect(dest);
+  osc.type=type;osc.frequency.setValueAtTime(freq,when);
+  g.gain.setValueAtTime(0,when);
+  g.gain.linearRampToValueAtTime(gainVal,when+.02);
+  g.gain.setValueAtTime(gainVal,when+dur*.7);
+  g.gain.exponentialRampToValueAtTime(.0001,when+dur);
+  osc.start(when);osc.stop(when+dur+.05);
+  return osc;
+}
+
+function scheduleMelody(startTime,tempo){
+  if(!musicPlaying)return;
+  const ctx=getCtx();
+  const beatLen=60/tempo;
+  const reverb=ctx.createConvolver();
+  // simple dry reverb via delay
+  const delay=ctx.createDelay(.4);
+  const delayGain=ctx.createGain();delayGain.gain.value=.22;
+  delay.connect(delayGain);delayGain.connect(ctx.destination);
+
+  let t=startTime;
+  MELODY.forEach(([idx,beats])=>{
+    const freq=SCALE[idx];
+    const dur=beats*beatLen*.92;
+    playNote(freq,dur,.12,'sine',ctx,ctx.destination,t);
+    playNote(freq*2.005,dur*.8,.04,'triangle',ctx,ctx.destination,t+.01);
+    t+=beats*beatLen;
+  });
+  const loopLen=MELODY.reduce((a,[,b])=>a+b,0)*beatLen;
+  melodyTimeout=setTimeout(()=>scheduleMelody(ctx.currentTime,tempo),loopLen*1000-100);
+}
+
+function scheduleBass(startTime,tempo){
+  if(!musicPlaying)return;
+  const ctx=getCtx();
+  const beatLen=60/tempo;
+  let t=startTime;
+  BASS.forEach(([idx,beats])=>{
+    const freq=SCALE[idx]/2;
+    playNote(freq,beats*beatLen*.8,.07,'triangle',ctx,ctx.destination,t);
+    t+=beats*beatLen;
+  });
+  const loopLen=BASS.reduce((a,[,b])=>a+b,0)*beatLen;
+  bassTimeout=setTimeout(()=>scheduleBass(ctx.currentTime,tempo),loopLen*1000-50);
+}
+
+function startMusic(){
+  if(musicPlaying)return;
+  musicPlaying=true;
+  const ctx=getCtx();
+  if(ctx.state==='suspended')ctx.resume();
+  scheduleMelody(ctx.currentTime+.1,88);
+  scheduleBass(ctx.currentTime+.1,88);
+  document.getElementById('music-btn').textContent='🔊';
+}
+
+function stopMusic(){
+  musicPlaying=false;
+  clearTimeout(melodyTimeout);clearTimeout(bassTimeout);
+  document.getElementById('music-btn').textContent='🔇';
+}
+
+function toggleMusic(){
+  if(musicPlaying)stopMusic();else startMusic();
+}
+
+// ============================================================
+//  SFX
+// ============================================================
+function sfxClick(){
+  try{const c=getCtx();[440,660].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.1,c.currentTime+i*.07);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.07+.15);o.start(c.currentTime+i*.07);o.stop(c.currentTime+i*.07+.2);});}catch(e){}
+}
+function sfxReveal(){
+  try{const c=getCtx();[523,659,784,1046].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.15,c.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.12+.5);o.start(c.currentTime+i*.12);o.stop(c.currentTime+i*.12+.6);});}catch(e){}
+}
+function sfxWrong(){
+  try{const c=getCtx();[220,196,174].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.08,c.currentTime+i*.18);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.18+.35);o.start(c.currentTime+i*.18);o.stop(c.currentTime+i*.18+.4);});}catch(e){}
+}
+
+// ============================================================
+//  RIPPLE
+// ============================================================
+function addRipple(btn,e){
+  const r=document.createElement('span');r.className='ripple';
+  const rect=btn.getBoundingClientRect();
+  const size=Math.max(rect.width,rect.height);
+  r.style.cssText=`width:${size}px;height:${size}px;left:${(e.clientX||rect.left+50)-rect.left-size/2}px;top:${(e.clientY||rect.top+25)-rect.top-size/2}px;`;
+  btn.appendChild(r);setTimeout(()=>r.remove(),600);
+}
+
+// ============================================================
+//  DATA
+// ============================================================
+const DEPTS=[
+  {id:'cyber', name:'هندسة الأمن السيبراني',           en:'Cyber Security Engineering',              icon:'🔐'},
+  {id:'ai',    name:'هندسة الأتمتة والذكاء الاصطناعي', en:'Automation & AI Engineering',             icon:'🤖'},
+  {id:'net',   name:'هندسة الشبكات',                   en:'Network Engineering',                     icon:'🌐'},
+  {id:'ice',   name:'هندسة المعلومات والاتصالات',       en:'Information & Communication Engineering', icon:'📡'},
+];
+
+/*
+  10 سؤال واضح تماماً — كل سؤال يحمل وزناً قوياً لقسم معين.
+  الأوزان: [أوافق بشدة, أوافق, محايد, لا أوافق كثيراً, لا أوافق أبداً]
+  كل وزن = {dept: نقاط}
+*/
+// بنك الأسئلة الكامل — 20 سؤال واضح، يختار منها عشوائياً بين 7-12 كل جلسة
+const ALL_QUESTIONS=[
+
+  /* ===== أمن سيبراني ===== */
+  {
+    q:'لو اكتشفت إن حسابك على موقع معين اتُخترق — هل تبدأ تحلل كيف صار الاختراق بدلاً من ما تغير كلمة السر فقط؟',
+    w:[{cyber:5},{ai:2,ice:1},{cyber:2,net:1},{net:1,ice:1}]
+  },
+  {
+    q:'هل تجذبك فكرة اختبار الاختراق (Penetration Testing) — يعني تحاول تكسر الأنظمة بطريقة قانونية لتحسينها؟',
+    w:[{cyber:5},{ai:2,net:1},{cyber:2,ice:1},{net:1,ai:1}]
+  },
+  {
+    q:'هل يثيرك موضوع التشفير وكيف تُخفى البيانات حتى لا يقدر أحد يقرأها بدون مفتاح؟',
+    w:[{cyber:4,ice:1},{ai:2,net:1},{cyber:2,ice:1},{net:1,ai:1}]
+  },
+  {
+    q:'لو تعين بشركة كبيرة — هل تفضل تشتغل في فريق الأمن اللي يحمي البنية التحتية من الهجمات؟',
+    w:[{cyber:5},{ai:2,ice:1},{cyber:2,net:1},{net:1,ice:1}]
+  },
+  {
+    q:'هل تهتم بقراءة أخبار الثغرات الأمنية (CVE) واختراقات الشركات الكبيرة مثل اختراق SolarWinds؟',
+    w:[{cyber:5},{net:1,ice:1},{cyber:2,ai:1},{ai:1,net:1}]
+  },
+
+  /* ===== ذكاء اصطناعي ===== */
+  {
+    q:'هل تحلم ببناء برنامج ذكاء اصطناعي يتعلم ويتطور لوحده دون تدخل بشري مستمر؟',
+    w:[{ai:5},{net:2,cyber:1},{ai:2,ice:1},{ice:1,cyber:1}]
+  },
+  {
+    q:'هل تعجبك الروبوتات والأنظمة الذكية الآلية مثل السيارات ذاتية القيادة وروبوتات المصانع؟',
+    w:[{ai:5,ice:1},{cyber:1,net:1},{ai:2,ice:1},{net:1,cyber:1}]
+  },
+  {
+    q:'هل تتخيل مستقبلك في بناء نماذج تحلل البيانات الضخمة وتتخذ قرارات ذكية تلقائياً؟',
+    w:[{ai:5},{ice:2,net:1},{ai:2,cyber:1},{cyber:1,net:1}]
+  },
+  {
+    q:'هل تبحث في مواضيع مثل Machine Learning أو Neural Networks من باب الاهتمام الشخصي؟',
+    w:[{ai:5},{net:1,cyber:1},{ai:2,ice:1},{ice:1,cyber:1}]
+  },
+  {
+    q:'لو أعطيتك مجموعة بيانات ضخمة — هل أول فكرة تجي في بالك هي كيف تدرّب نموذج ذكاء اصطناعي عليها؟',
+    w:[{ai:5},{cyber:2,net:1},{ai:2,ice:1},{ice:1,net:1}]
+  },
+
+  /* ===== شبكات ===== */
+  {
+    q:'لو انقطع الإنترنت فجأة في بيتك — هل أول شيء تفكر فيه هو تشخيص المشكلة بنفسك من الراوتر؟',
+    w:[{net:5},{ai:2,cyber:1},{net:2,ice:1},{ice:1,ai:1}]
+  },
+  {
+    q:'هل تهتم بتصميم شبكات الشركات الكبيرة — يعني كيف تربط مئات الأجهزة والسيرفرات ببعض؟',
+    w:[{net:5},{cyber:1,ai:1},{net:2,ice:1},{ice:1,cyber:1}]
+  },
+  {
+    q:'هل تعرف الفرق بين بروتوكولات مثل TCP و UDP و BGP، وتجد هذا الموضوع ممتعاً؟',
+    w:[{net:5},{ice:1,cyber:1},{net:2,ai:1},{ai:1,ice:1}]
+  },
+  {
+    q:'هل تتخيل نفسك تشتغل مهندس شبكات يصمم ويدير البنية التحتية لشبكات الجيل الجديد؟',
+    w:[{net:5,ice:1},{ai:2,cyber:1},{net:2,ice:1},{cyber:1,ai:1}]
+  },
+
+  /* ===== معلومات واتصالات ===== */
+  {
+    q:'هل يستهويك موضوع كيف تنتقل الإشارات والبيانات عبر الهواء والكابلات مثل شبكات 5G والألياف الضوئية؟',
+    w:[{ice:5,net:1},{ai:2,cyber:1},{ice:2,net:1},{cyber:1,ai:1}]
+  },
+  {
+    q:'هل تفضل العمل في مجال الاتصالات مثل شركات Zain أو Asiacell على مجال البرمجة أو الأمن؟',
+    w:[{ice:5,net:1},{ai:2,cyber:1},{ice:2,net:1},{cyber:1,ai:1}]
+  },
+  {
+    q:'هل تهتم بمواضيع مثل تصميم أبراج الاتصال، الترددات، وكيفية توزيع الإشارة على مناطق واسعة؟',
+    w:[{ice:5},{net:2,ai:1},{ice:2,net:1},{cyber:1,ai:1}]
+  },
+  {
+    q:'هل يثيرك موضوع معالجة الإشارات الرقمية (Digital Signal Processing) وكيف تُشفَّر وتُضغط الصوت والصورة؟',
+    w:[{ice:5},{ai:2,net:1},{ice:2,cyber:1},{cyber:1,net:1}]
+  },
+
+  /* ===== أسئلة عامة مميزة ===== */
+  {
+    q:'لو طلبوا منك تختار مشروع تخرج — هل تختار مشروع يحمي خصوصية المستخدمين من التجسس؟',
+    w:[{cyber:4,ice:1},{ai:2,net:1},{cyber:2,ice:1},{net:1,ai:1}]
+  },
+  {
+    q:'هل تشعر بالإثارة عندما تسمع كلمة "هاكاثون" وتريد المشاركة فيه فوراً؟',
+    w:[{cyber:3,ai:2},{net:2,ice:1},{cyber:1,ai:1,net:1},{ice:1,net:1}]
+  },
+];
+
+// اختيار عشوائي بين 7-12 سؤال من البنك الكامل
+const NUM_Q = 7 + Math.floor(Math.random() * 6); // 7 إلى 12
+function pickQuestions(){
+  return [...ALL_QUESTIONS].sort(()=>Math.random()-.5).slice(0,NUM_Q);
+}
+
+let QUESTIONS = pickQuestions();
+
+const OPTS=[
+  {cls:'o1',icon:'✅',text:'نعم'},
+  {cls:'o2',icon:'❌',text:'لا'},
+  {cls:'o3',icon:'🤔',text:'من الممكن'},
+  {cls:'o4',icon:'🤷',text:'أنا لا أعلم'},
+];
+
+const DEPT_SPEECH={
+  cyber:`أنت من النوع اللي <span class="hl">ما يثق بأي نظام حتى يختبره بنفسه</span> 😎<br>
+تقرأ كل إعداد أمني بعين ناقدة، وأول سؤالك لأي تطبيق: "شنو الصلاحيات اللي يطلبها؟"<br>
+CVEs وثغرات الأنظمة أكثر إثارةً عندك من أي خبر ثاني.<br>
+المارد يقول: <span class="hl">قسمك هو هندسة الأمن السيبراني بلا شك.</span>`,
+
+  ai:`أنت من النوع اللي <span class="hl">يشوف مشكلة ويفكر: شنو الـ Algorithm المناسب؟</span> 🤖<br>
+تتخيل الروبوتات والبرامج الذكية كل يوم، وتحلم بعالم يعمل تلقائياً.<br>
+Neural Networks بالنسبة إلك مو مجرد درس — هي طريقة تفكير.<br>
+المارد يقول: <span class="hl">أنت من عائلة الأتمتة والذكاء الاصطناعي.</span>`,
+
+  net:`أنت من النوع اللي <span class="hl">يشوف الـ Network Topology ويحس بالراحة</span> 🌐<br>
+تفهم كيف تتواصل الأجهزة، وتعرف الفرق بين كل بروتوكول وآخر.<br>
+لو انقطع النت — أنت أول واحد يشخّص المشكلة ويحلها.<br>
+المارد يقول: <span class="hl">قسمك هو هندسة الشبكات.</span>`,
+
+  ice:`أنت من النوع اللي <span class="hl">يربط عالمين: عالم المعلومات وعالم الاتصالات</span> 📡<br>
+تفهم كيف تنتقل الإشارة، وكيف تُشفَّر، وكيف تصل سليمة لوجهتها.<br>
+الـ 5G والألياف الضوئية وشبكات الجيل القادم — هذا عالمك.<br>
+المارد يقول: <span class="hl">أنت من هندسة المعلومات والاتصالات.</span>`,
+};
+
+// ============================================================
+//  STATE
+// ============================================================
+let scores={cyber:0,ai:0,net:0,ice:0};
+let qIndex=0;
+let extraMode=false; // extra questions after wrong guess
+let extraPool=[];
+let wrongCount=0;
+
+// ============================================================
+//  GAME LOGIC
+// ============================================================
+function startGame(){
+  startMusic();
+  scores={cyber:0,ai:0,net:0,ice:0};
+  qIndex=0;extraMode=false;wrongCount=0;extraPool=[];
+  QUESTIONS=pickQuestions(); // أسئلة عشوائية جديدة في كل جلسة
+  document.getElementById('screen-intro').style.display='none';
+  document.getElementById('screen-game').style.display='block';
+  renderQuestion();
+}
+
+function renderQuestion(){
+  if(qIndex>=QUESTIONS.length&&!extraMode){showResult();return;}
+
+  const q=extraMode? extraPool[qIndex] : QUESTIONS[qIndex];
+  if(!q){showResult();return;}
+
+  const total=extraMode? QUESTIONS.length+qIndex+1 : qIndex+1;
+  const maxQ=extraMode? QUESTIONS.length+extraPool.length : QUESTIONS.length;
+  const pct=(qIndex/maxQ)*100;
+  document.getElementById('prog-bar').style.width=pct+'%';
+
+  const optHTML=OPTS.map((o,i)=>`
+    <button class="ans-btn ${o.cls}" onclick="handleAnswer(${i})" onmousedown="addRipple(this,event)">
+      <span class="ans-icon">${o.icon}</span>${o.text}
+    </button>
+  `).join('');
+
+  document.getElementById('question-area').innerHTML=`
+    <div class="question-card">
+      <div class="genie-think">🧞</div>
+      <div class="q-num">السؤال ${total} من ${maxQ}</div>
+      <div class="question-text">${q.q}</div>
+      <div class="answers">${optHTML}</div>
+    </div>
+  `;
+}
+
+function handleAnswer(optIdx){
+  sfxClick();
+  document.querySelectorAll('.ans-btn').forEach(b=>b.style.pointerEvents='none');
+  // highlight selected
+  document.querySelectorAll('.ans-btn')[optIdx].classList.add('sel');
+
+  const q=extraMode? extraPool[qIndex] : QUESTIONS[qIndex];
+  const weights=q.w[optIdx]||{};
+  Object.entries(weights).forEach(([d,w])=>{scores[d]=(scores[d]||0)+w;});
+  qIndex++;
+
+  document.getElementById('question-area').innerHTML=`
+    <div class="thinking-wrap">
+      <div class="thinking-genie">🧞</div>
+      <div class="thinking-dots"><span></span><span></span><span></span></div>
+      <div class="thinking-text">المارد يحلل إجابتك...</div>
+    </div>`;
+
+  setTimeout(renderQuestion,850);
+}
+
+function getWinner(){
+  return Object.entries(scores).sort((a,b)=>b[1]-a[1])[0][0];
+}
+
+function getConfidence(){
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const total=Object.values(scores).reduce((a,b)=>a+b,0)||1;
+  const pct=Math.round((sorted[0][1]/total)*100);
+  return Math.max(74,Math.min(97,pct));
+}
+
+function showResult(){
+  document.getElementById('screen-game').style.display='none';
+  document.getElementById('screen-result').style.display='block';
+
+  const winnerId=getWinner();
+  const dept=DEPTS.find(d=>d.id===winnerId); // ← always finds by id, no bug
+
+  document.getElementById('res-icon').textContent=dept.icon;
+  document.getElementById('res-name').textContent=dept.name;
+  document.getElementById('res-name-en').textContent=dept.en;
+  document.getElementById('res-speech').innerHTML=DEPT_SPEECH[winnerId];
+
+  const conf=getConfidence();
+  document.getElementById('conf-pct').textContent=conf+'%';
+  document.getElementById('prog-bar').style.width='100%';
+  setTimeout(()=>{document.getElementById('conf-fill').style.width=conf+'%';},400);
+
+  sfxReveal();
+  setTimeout(burst,300);
+}
+
+// ============================================================
+//  WRONG GUESS FLOW
+// ============================================================
+function showWrong(){
+  sfxWrong();
+  wrongCount++;
+  document.getElementById('screen-result').style.display='none';
+  document.getElementById('screen-wrong').style.display='block';
+
+  const dc=document.getElementById('dept-choices');
+  dc.innerHTML=DEPTS.map(d=>`
+    <button class="dept-choice-btn" onclick="revealCorrect('${d.id}')">
+      <span class="d-icon">${d.icon}</span>
+      <span class="d-name">${d.name}</span>
+    </button>
+  `).join('');
+}
+
+function continueGame(){
+  // Build extra questions from remaining pool (shuffle all again, skip already asked)
+  extraPool=[...QUESTIONS].sort(()=>Math.random()-.5).slice(0,5); // 5 extra
+  qIndex=0;extraMode=true;
+  document.getElementById('screen-wrong').style.display='none';
+  document.getElementById('screen-game').style.display='block';
+  renderQuestion();
+}
+
+function revealCorrect(id){
+  sfxReveal();
+  const dept=DEPTS.find(d=>d.id===id);
+  document.getElementById('screen-wrong').innerHTML=`
+    <div style="padding:18px 0;text-align:center;">
+      <div style="font-size:68px;margin-bottom:10px;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(77,159,255,.6))">${dept.icon}</div>
+      <div style="font-size:10px;letter-spacing:.22em;color:var(--blue);margin-bottom:8px;font-weight:700">المارد يعترف 🙇</div>
+      <div style="font-size:24px;font-weight:900;color:#fff;direction:rtl;margin-bottom:3px">${dept.name}</div>
+      <div style="font-size:12px;color:var(--gold);letter-spacing:.1em;margin-bottom:18px">${dept.en}</div>
+      <div style="background:var(--card);border:1px solid rgba(77,159,255,.18);border-radius:16px;padding:16px 14px;direction:rtl;font-size:15px;line-height:1.9;margin-bottom:18px;color:var(--text)">
+        المارد اعترف — هذي المرة غلط الحساب مو العلم 😄<br>
+        أنت من الناس الصعب تُحزرهم، وهذا يعني إن شخصيتك <span style="color:var(--gold);font-weight:700">متعددة المواهب</span>!<br>
+        لكن قسم <span style="color:var(--gold);font-weight:700">${dept.name}</span> محظوظ بيك 🎯
+      </div>
+      <button class="replay-btn" onclick="restart()">🔄 العب مرة ثانية</button>
+    </div>
+  `;
+  setTimeout(burst,200);
+}
+
+// ============================================================
+//  RESTART
+// ============================================================
+function restart(){
+  scores={cyber:0,ai:0,net:0,ice:0};
+  qIndex=0;extraMode=false;wrongCount=0;extraPool=[];
+  QUESTIONS=pickQuestions(); // أسئلة جديدة عند إعادة اللعب
+  ['screen-result','screen-wrong','screen-game'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('screen-wrong').innerHTML=`
+    <div class="wrong-genie">😤</div>
+    <div style="font-size:19px;font-weight:900;color:#fff;margin-bottom:6px;direction:rtl">المارد يزيد الأسئلة... 🔍</div>
+    <div style="font-size:13px;color:var(--smoke);direction:rtl;margin-bottom:4px;">أو اخبرني: شنو قسمك الحقيقي؟</div>
+    <div class="dept-choices" id="dept-choices"></div>
+    <button class="replay-btn" onclick="continueGame()">🧞 اسألني أسئلة زيادة</button>
+  `;
+  document.getElementById('screen-intro').style.display='flex';
+  document.getElementById('prog-bar').style.width='0%';
+  document.getElementById('conf-fill').style.width='0%';
+}
+
+// ============================================================
+//  BURST PARTICLES
+// ============================================================
+function burst(){
+  const b=document.createElement('div');b.className='burst';document.body.appendChild(b);
+  const cols=['#2563ff','#ffc94d','#00ff88','#a855f7','#fff','#06b6d4'];
+  for(let i=0;i<42;i++){
+    const p=document.createElement('div');p.className='particle';
+    const angle=Math.random()*360,dist=90+Math.random()*230;
+    p.style.cssText=`left:50%;top:38%;background:${cols[i%cols.length]};--tx:${Math.cos(angle*Math.PI/180)*dist}px;--ty:${Math.sin(angle*Math.PI/180)*dist-80}px;animation-delay:${Math.random()*.4}s`;
+    b.appendChild(p);
+  }
+  setTimeout(()=>b.remove(),2200);
+}
+</script>
+</body>
+</html>
