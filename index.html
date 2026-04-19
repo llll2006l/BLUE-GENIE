@@ -739,28 +739,49 @@ body{padding-top:env(safe-area-inset-top,0px);}
 (function(){
   function playSplashSound(){
     try{
-      const ctx=new(window.AudioContext||window.webkitAudioContext)();
-      // موجة سحرية صاعدة
-      [180,240,320,420,540,680,860,1080].forEach((f,i)=>{
-        const o=ctx.createOscillator(),g=ctx.createGain(),flt=ctx.createBiquadFilter();
-        flt.type='lowpass';flt.frequency.value=2000;
-        o.connect(flt);flt.connect(g);g.connect(ctx.destination);
-        o.type=i%2?'triangle':'sine';
-        o.frequency.setValueAtTime(f*.5,ctx.currentTime+i*.2);
-        o.frequency.linearRampToValueAtTime(f,ctx.currentTime+i*.2+.5);
-        g.gain.setValueAtTime(0,ctx.currentTime+i*.2);
-        g.gain.linearRampToValueAtTime(.07,ctx.currentTime+i*.2+.08);
-        g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+i*.2+.9);
-        o.start(ctx.currentTime+i*.2);o.stop(ctx.currentTime+i*.2+1);
+      var c=new(window.AudioContext||window.webkitAudioContext)();
+      // ريفيرب للـ splash
+      var sr=c.sampleRate,buf=c.createBuffer(2,sr*3,sr);
+      for(var ch=0;ch<2;ch++){var d=buf.getChannelData(ch);for(var j=0;j<sr*3;j++)d[j]=(Math.random()*2-1)*Math.pow(1-j/(sr*3),2.2);}
+      var rv=c.createConvolver();rv.buffer=buf;
+      var rvG=c.createGain();rvG.gain.value=0.6;
+      var master=c.createGain();master.gain.value=0;
+      rv.connect(rvG);rvG.connect(master);master.connect(c.destination);
+      master.gain.linearRampToValueAtTime(1.2,c.currentTime+0.5);
+      master.gain.setValueAtTime(1.2,c.currentTime+2.5);
+      master.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+3.8);
+      // مقام حجاز
+      var H=[130.81,164.81,196.00,246.94,261.63,329.63,392.00,493.88,523.25,659.25];
+      // arpeggio ناي صاعد عند ظهور المارد
+      [0,1,2,3,4,5,6,7].forEach(function(i){
+        var freq=H[i];
+        var t=c.currentTime+i*0.18;
+        // ناي مصغّر
+        var osc=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+        lp.type='lowpass';lp.frequency.value=freq*3;
+        osc.type='sine';osc.frequency.value=freq;
+        osc.connect(lp);lp.connect(g);g.connect(rv);
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(0.35,t+0.12);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.7);
+        osc.start(t);osc.stop(t+0.85);
+        // جرس فوق كل نغمة
+        var bell=c.createOscillator(),bg=c.createGain();
+        bell.type='sine';bell.frequency.value=freq*4;
+        bell.connect(bg);bg.connect(rv);
+        bg.gain.setValueAtTime(0.12,t+0.01);
+        bg.gain.exponentialRampToValueAtTime(0.0001,t+0.9);
+        bell.start(t);bell.stop(t+1.0);
       });
-      // دقة عميقة
-      const ob=ctx.createOscillator(),gb=ctx.createGain();
-      ob.connect(gb);gb.connect(ctx.destination);ob.type='sine';
-      ob.frequency.setValueAtTime(50,ctx.currentTime);
-      ob.frequency.linearRampToValueAtTime(85,ctx.currentTime+2.8);
-      gb.gain.setValueAtTime(.14,ctx.currentTime);
-      gb.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+3.2);
-      ob.start(ctx.currentTime);ob.stop(ctx.currentTime+3.5);
+      // نبضة باس عميقة مع ظهور المارد
+      var bass=c.createOscillator(),bg2=c.createGain();
+      bass.type='sine';bass.frequency.setValueAtTime(65,c.currentTime+0.3);
+      bass.frequency.exponentialRampToValueAtTime(40,c.currentTime+2.5);
+      bass.connect(bg2);bg2.connect(master);
+      bg2.gain.setValueAtTime(0,c.currentTime+0.3);
+      bg2.gain.linearRampToValueAtTime(0.28,c.currentTime+0.6);
+      bg2.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+3.2);
+      bass.start(c.currentTime+0.3);bass.stop(c.currentTime+3.5);
     }catch(e){}
   }
 
@@ -884,36 +905,105 @@ function openQR(){
 function closeQR(e){if(!e||e.target===document.getElementById('qr-modal'))document.getElementById('qr-modal').classList.remove('open');}
 
 // ============================================================
-//  MUSIC — سحر صوتي غامض (مقام حجاز شرقي + ريفيرب + صوت عالٍ)
+//  🧞 نظام الصوت الموحّد — المارد الأزرق (ناي حجازي سحري)
 // ============================================================
 let audioCtx=null,musicPlaying=false;
-let melodyTID=null,droneTID=null,shimmerTID=null;
-let melodyIdx=0,droneIdx=0;
+let _tids=[];
+let _mIdx=0,_bIdx=0;
 
 function getCtx(){
   if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
   return audioCtx;
 }
 
-// ── ريفيرب طبيعي ────────────────────────────────────────────
-function makeReverb(ctx,duration,decay){
-  const sr=ctx.sampleRate,len=sr*duration;
-  const buf=ctx.createBuffer(2,len,sr);
-  for(let ch=0;ch<2;ch++){
-    const d=buf.getChannelData(ch);
-    for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);
-  }
-  const conv=ctx.createConvolver();conv.buffer=buf;return conv;
+// ══════════════════════════════════════════════════════════════
+//  أدوات مشتركة
+// ══════════════════════════════════════════════════════════════
+function mkReverb(ctx,dur,dec){
+  const sr=ctx.sampleRate,buf=ctx.createBuffer(2,sr*dur,sr);
+  for(let c=0;c<2;c++){const d=buf.getChannelData(c);for(let i=0;i<sr*dur;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/(sr*dur),dec);}
+  const v=ctx.createConvolver();v.buffer=buf;return v;
 }
 
-// ── مقام حجاز الشرقي الغامض ─────────────────────────────────
+// ── مقام حجاز الشرقي الغامض: C  D♭  E  F  G  A♭  B ────────
 const HIJAZ=[
   130.81,138.59,164.81,174.61,196.00,207.65,246.94,
   261.63,277.18,329.63,349.23,392.00,415.30,493.88,
-  523.25,554.37,659.25
+  523.25,554.37,659.25,698.46,783.99,830.61,987.77,
 ];
 
-const MYSTIC_MELODY=[
+// ══════════════════════════════════════════════════════════════
+//  🎵 صوت الناي — القلب الصوتي لكل شيء
+// ══════════════════════════════════════════════════════════════
+function playNay(ctx,dest,freq,dur,vol,when,vibRate,vibDepth){
+  vibRate=vibRate||5.2; vibDepth=vibDepth||0.009;
+  // طبقة 1: نغمة جيبية + vibrato
+  const osc=ctx.createOscillator(),vibLFO=ctx.createOscillator();
+  const vibG=ctx.createGain(),gain=ctx.createGain(),lp=ctx.createBiquadFilter();
+  vibLFO.frequency.value=vibRate; vibG.gain.value=freq*vibDepth;
+  vibLFO.connect(vibG); vibG.connect(osc.frequency);
+  lp.type='lowpass'; lp.frequency.value=freq*3.5; lp.Q.value=0.7;
+  osc.type='sine'; osc.frequency.value=freq;
+  osc.connect(lp); lp.connect(gain); gain.connect(dest);
+  gain.gain.setValueAtTime(0,when);
+  gain.gain.linearRampToValueAtTime(vol*0.85,when+0.14);
+  gain.gain.setValueAtTime(vol*0.85,when+dur*0.72);
+  gain.gain.exponentialRampToValueAtTime(0.0001,when+dur);
+  vibLFO.start(when+0.08); vibLFO.stop(when+dur+0.1);
+  osc.start(when); osc.stop(when+dur+0.12);
+  // طبقة 2: نفخ هواء
+  const nb=ctx.createBuffer(1,ctx.sampleRate*0.5,ctx.sampleRate);
+  const nd=nb.getChannelData(0);
+  for(let i=0;i<nd.length;i++)nd[i]=Math.random()*2-1;
+  const ns=ctx.createBufferSource(); ns.buffer=nb; ns.loop=true;
+  const nbp=ctx.createBiquadFilter(),nG=ctx.createGain();
+  nbp.type='bandpass'; nbp.frequency.value=freq*1.4; nbp.Q.value=6;
+  ns.connect(nbp); nbp.connect(nG); nG.connect(dest);
+  nG.gain.setValueAtTime(0,when);
+  nG.gain.linearRampToValueAtTime(vol*0.18,when+0.06);
+  nG.gain.linearRampToValueAtTime(vol*0.06,when+0.22);
+  nG.gain.exponentialRampToValueAtTime(0.0001,when+dur*0.7);
+  ns.start(when); ns.stop(when+dur+0.1);
+  // طبقة 3: هارمونيك
+  const h=ctx.createOscillator(),hg=ctx.createGain();
+  h.type='sine'; h.frequency.value=freq*2;
+  h.connect(hg); hg.connect(dest);
+  hg.gain.setValueAtTime(0,when+0.1);
+  hg.gain.linearRampToValueAtTime(vol*0.12,when+0.25);
+  hg.gain.exponentialRampToValueAtTime(0.0001,when+dur*0.8);
+  h.start(when+0.1); h.stop(when+dur+0.1);
+}
+
+function playDrone(ctx,dest,freq,dur,vol,when){
+  ['sine','triangle'].forEach(function(t,i){
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=t; o.frequency.value=i===0?freq:freq*0.498;
+    o.connect(g); g.connect(dest);
+    g.gain.setValueAtTime(0,when);
+    g.gain.linearRampToValueAtTime(vol*(i?0.45:1),when+0.35);
+    g.gain.setValueAtTime(vol*(i?0.45:1),when+dur*0.75);
+    g.gain.exponentialRampToValueAtTime(0.0001,when+dur);
+    o.start(when); o.stop(when+dur+0.1);
+  });
+}
+
+function playBellTone(ctx,dest,freq,dur,vol,when){
+  const mod=ctx.createOscillator(),modG=ctx.createGain();
+  const car=ctx.createOscillator(),carG=ctx.createGain();
+  mod.frequency.value=freq*2.756; modG.gain.value=freq*1.8;
+  mod.connect(modG); modG.connect(car.frequency);
+  car.type='sine'; car.frequency.value=freq;
+  car.connect(carG); carG.connect(dest);
+  carG.gain.setValueAtTime(vol,when+0.001);
+  carG.gain.exponentialRampToValueAtTime(0.0001,when+dur);
+  mod.start(when); mod.stop(when+dur+0.1);
+  car.start(when); car.stop(when+dur+0.1);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  🎶 الموسيقى الرئيسية
+// ══════════════════════════════════════════════════════════════
+const MELODY_SEQ=[
   [7,1.5],[8,0.5],[10,1],[9,0.5],[7,0.5],[6,1],[4,1],
   [5,0.5],[7,0.5],[8,1],[10,0.5],[9,0.5],[7,1.5],[6,0.5],
   [4,1],[2,1],[1,0.5],[2,0.5],[4,1],[5,0.5],[4,0.5],
@@ -921,198 +1011,153 @@ const MYSTIC_MELODY=[
   [7,1],[9,0.5],[10,0.5],[12,1],[10,0.5],[9,0.5],
   [8,1],[7,0.5],[6,0.5],[4,1.5],[2,0.5],[1,2],
 ];
-const DRONE_NOTES=[0,4,0,6,4,0,2,0];
+const BASS_SEQ=[[0,2],[4,1],[0,1],[6,2],[4,1],[2,1],[0,2],[5,2]];
 
-// ── نغمة مع vibrato ─────────────────────────────────────────
-function playMysticNote(ctx,dest,freq,dur,vol,type,when){
-  const osc=ctx.createOscillator(),gain=ctx.createGain(),filt=ctx.createBiquadFilter();
-  filt.type='bandpass';filt.frequency.value=freq*2.2;filt.Q.value=1.8;
-  osc.connect(filt);filt.connect(gain);gain.connect(dest);
-  osc.type=type;osc.frequency.setValueAtTime(freq,when);
-  const vd=freq*0.007;
-  for(let i=0;i<Math.ceil(dur*4.5);i++){
-    osc.frequency.setValueAtTime(freq+Math.sin(i*Math.PI)*vd,when+0.15+i/4.5);
-  }
-  gain.gain.setValueAtTime(0,when);
-  gain.gain.linearRampToValueAtTime(vol,when+0.1);
-  gain.gain.setValueAtTime(vol,when+dur*0.7);
-  gain.gain.exponentialRampToValueAtTime(0.0001,when+dur);
-  osc.start(when);osc.stop(when+dur+0.1);
-}
-
-// ── صوت ناي ──────────────────────────────────────────────────
-function playNay(ctx,dest,freq,dur,vol,when){
-  const saw=ctx.createOscillator(),bf=ctx.createBiquadFilter(),ng=ctx.createGain();
-  saw.type='sawtooth';saw.frequency.value=freq;
-  bf.type='bandpass';bf.frequency.value=freq;bf.Q.value=10;
-  saw.connect(bf);bf.connect(ng);ng.connect(dest);
-  ng.gain.setValueAtTime(0,when);ng.gain.linearRampToValueAtTime(vol*0.45,when+0.2);
-  ng.gain.exponentialRampToValueAtTime(0.0001,when+dur);
-  saw.start(when);saw.stop(when+dur+0.05);
-  playMysticNote(ctx,dest,freq,dur,vol*0.9,'sine',when);
-}
-
-// ── باس عميق طبقتان ──────────────────────────────────────────
-function playDrone(ctx,dest,freq,dur,vol,when){
-  ['sine','triangle'].forEach((type,i)=>{
-    const o=ctx.createOscillator(),g=ctx.createGain();
-    o.connect(g);g.connect(dest);
-    o.type=type;o.frequency.value=i===0?freq:freq*0.5;
-    g.gain.setValueAtTime(0,when);
-    g.gain.linearRampToValueAtTime(vol*(i===0?1:0.5),when+0.4);
-    g.gain.setValueAtTime(vol*(i===0?1:0.5),when+dur-0.5);
-    g.gain.exponentialRampToValueAtTime(0.0001,when+dur);
-    o.start(when);o.stop(when+dur+0.1);
-  });
-}
-
-// ── جرس سحري عند الفتح ──────────────────────────────────────
-function playMagicBell(ctx,dest,when){
-  [523.25,659.25,783.99,1046.50,1318.51].forEach((f,i)=>{
-    const o=ctx.createOscillator(),g=ctx.createGain();
-    o.connect(g);g.connect(dest);o.type='sine';o.frequency.value=f;
-    g.gain.setValueAtTime(0,when+i*0.12);
-    g.gain.linearRampToValueAtTime(0.18-i*0.02,when+i*0.12+0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001,when+i*0.12+2.8);
-    o.start(when+i*0.12);o.stop(when+i*0.12+3.2);
-  });
-}
-
-// ── جدولة اللحن ──────────────────────────────────────────────
-function scheduleMysticMelody(when,bpm,reverb,dry){
-  if(!musicPlaying)return;
-  const ctx=getCtx(),beat=60/bpm;
-  const [ni,beats]=MYSTIC_MELODY[melodyIdx%MYSTIC_MELODY.length];
-  const freq=HIJAZ[ni],dur=beats*beat*0.88;
-  if(melodyIdx%3===0) playNay(ctx,reverb,freq,dur,0.38,when);
-  else playMysticNote(ctx,reverb,freq*2,dur,0.28,'sine',when);
-  playMysticNote(ctx,dry,freq*2,dur,0.14,'triangle',when+beat*0.5);
-  melodyIdx++;
-  melodyTID=setTimeout(()=>scheduleMysticMelody(ctx.currentTime,bpm,reverb,dry),(beats*beat)*1000-50);
-}
-
-// ── جدولة الباس ──────────────────────────────────────────────
-function scheduleDrone(when,bpm,reverb){
-  if(!musicPlaying)return;
-  const ctx=getCtx(),beat=60/bpm;
-  const ni=DRONE_NOTES[droneIdx%DRONE_NOTES.length];
-  playDrone(ctx,reverb,HIJAZ[ni]*0.5,beat*2*0.9,0.22,when);
-  droneIdx++;
-  droneTID=setTimeout(()=>scheduleDrone(ctx.currentTime,bpm,reverb),beat*2*1000-30);
-}
-
-// ── تلألؤ خلفي ───────────────────────────────────────────────
-function scheduleShimmer(dest){
+function schedMelody(when,beat,rv,dry){
   if(!musicPlaying)return;
   const ctx=getCtx();
-  const f=HIJAZ[Math.floor(Math.random()*HIJAZ.length)]*4;
-  const o=ctx.createOscillator(),g=ctx.createGain();
-  o.connect(g);g.connect(dest);o.type='sine';o.frequency.value=f;
-  const t=ctx.currentTime;
-  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.07,t+0.05);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+2.0);
-  o.start(t);o.stop(t+2.2);
-  shimmerTID=setTimeout(()=>scheduleShimmer(dest),1000+Math.random()*2000);
+  const pair=MELODY_SEQ[_mIdx%MELODY_SEQ.length];
+  const ni=pair[0],beats=pair[1];
+  const freq=HIJAZ[ni],dur=beats*beat*0.86;
+  const choice=_mIdx%3;
+  if(choice===0) playNay(ctx,rv,freq,dur,0.38,when);
+  else if(choice===1) playBellTone(ctx,rv,freq*2,dur*0.7,0.10,when);
+  else playNay(ctx,dry,freq,dur*1.1,0.22,when,4.8,0.007);
+  _mIdx++;
+  const tid=setTimeout(function(){schedMelody(ctx.currentTime,beat,rv,dry);},beats*beat*1000-40);
+  _tids.push(tid);
 }
 
-// ── تشغيل / إيقاف ───────────────────────────────────────────
+function schedBass(when,beat,dest){
+  if(!musicPlaying)return;
+  const ctx=getCtx();
+  const pair=BASS_SEQ[_bIdx%BASS_SEQ.length];
+  const ni=pair[0],beats=pair[1];
+  playDrone(ctx,dest,HIJAZ[ni]*0.5,beats*beat*0.88,0.26,when);
+  _bIdx++;
+  const tid=setTimeout(function(){schedBass(ctx.currentTime,beat,dest);},beats*beat*1000-30);
+  _tids.push(tid);
+}
+
+function schedShimmer(dest){
+  if(!musicPlaying)return;
+  const ctx=getCtx();
+  playBellTone(ctx,dest,HIJAZ[Math.floor(Math.random()*HIJAZ.length)]*4,1.6,0.055,ctx.currentTime);
+  const tid=setTimeout(function(){schedShimmer(dest);},900+Math.random()*2100);
+  _tids.push(tid);
+}
+
+function playOpeningArp(ctx,dest,when){
+  [0,2,4,7,8,10,12,14].forEach(function(ni,i){
+    playBellTone(ctx,dest,HIJAZ[ni],1.2,0.22-i*0.018,when+i*0.11);
+    if(i<4) playNay(ctx,dest,HIJAZ[ni],0.6,0.14,when+i*0.11,5,0.005);
+  });
+}
+
 function startMusic(){
   if(musicPlaying)return;
-  musicPlaying=true;
+  musicPlaying=true; _mIdx=0; _bIdx=0; _tids=[];
   const ctx=getCtx();
   if(ctx.state==='suspended')ctx.resume();
-
-  const reverb=makeReverb(ctx,4.0,2.5);
-  const rvGain=ctx.createGain();rvGain.gain.value=0.75;
-  const dryGain=ctx.createGain();dryGain.gain.value=0.65;
-  const master=ctx.createGain();master.gain.value=0.0;
+  const rv=mkReverb(ctx,4.2,2.4);
+  const rvG=ctx.createGain(); rvG.gain.value=0.72;
+  const dryG=ctx.createGain(); dryG.gain.value=0.62;
+  const master=ctx.createGain(); master.gain.value=0;
   const comp=ctx.createDynamicsCompressor();
-  comp.threshold.value=-18;comp.ratio.value=4;comp.knee.value=6;
-
-  reverb.connect(rvGain);rvGain.connect(master);
-  dryGain.connect(master);
-  master.connect(comp);comp.connect(ctx.destination);
-
-  // fade-in تدريجي
-  master.gain.linearRampToValueAtTime(1.35,ctx.currentTime+3.0);
-
-  const t=ctx.currentTime+0.2,bpm=58;
-  playMagicBell(ctx,rvGain,t);
-  setTimeout(()=>scheduleMysticMelody(ctx.currentTime+0.1,bpm,reverb,dryGain),1800);
-  setTimeout(()=>scheduleDrone(ctx.currentTime+0.1,bpm,reverb),600);
-  setTimeout(()=>scheduleShimmer(rvGain),3000);
-
+  comp.threshold.value=-16; comp.ratio.value=4; comp.knee.value=5;
+  rv.connect(rvG); rvG.connect(master); dryG.connect(master);
+  master.connect(comp); comp.connect(ctx.destination);
+  master.gain.linearRampToValueAtTime(1.4,ctx.currentTime+2.8);
+  const bpm=56,beat=60/bpm,t=ctx.currentTime+0.2;
+  playOpeningArp(ctx,rvG,t);
+  var t1=setTimeout(function(){schedBass(ctx.currentTime,beat,rvG);},1400);
+  var t2=setTimeout(function(){schedMelody(ctx.currentTime,beat,rv,dryG);},2200);
+  var t3=setTimeout(function(){schedShimmer(rvG);},3500);
+  _tids.push(t1,t2,t3);
   document.getElementById('music-btn').textContent='🔊';
 }
 
 function stopMusic(){
   musicPlaying=false;
-  [melodyTID,droneTID,shimmerTID].forEach(id=>clearTimeout(id));
-  melodyIdx=0;droneIdx=0;
+  _tids.forEach(function(id){clearTimeout(id);});
+  _tids=[]; _mIdx=0; _bIdx=0;
   document.getElementById('music-btn').textContent='🔇';
 }
 
 function toggleMusic(){
   if(musicPlaying)stopMusic();
-  else{const ctx=getCtx();if(ctx.state==='suspended')ctx.resume().then(startMusic);else startMusic();}
+  else{var ctx=getCtx();if(ctx.state==='suspended')ctx.resume().then(startMusic);else startMusic();}
 }
 
-// ============================================================
-//  SFX
-// ============================================================
-function sfxClick(type='neutral'){
+// ══════════════════════════════════════════════════════════════
+//  🔊 تأثيرات صوتية — كلها ناي حجازي تفاعلي
+// ══════════════════════════════════════════════════════════════
+function _sfxSetup(vol){
+  vol=vol||0.9;
+  var c=getCtx();
+  if(c.state==='suspended')c.resume();
+  var rv=mkReverb(c,1.8,2.0);
+  var rvG=c.createGain(); rvG.gain.value=0.5;
+  var dry=c.createGain(); dry.gain.value=0.8;
+  var master=c.createGain(); master.gain.value=vol;
+  rv.connect(rvG); rvG.connect(master); dry.connect(master);
+  master.connect(c.destination);
+  return{c:c,rv:rv,dry:dry,t:c.currentTime};
+}
+
+// نقرة إجابة — ناي قصير بنغمة من المقام
+function sfxClick(type){
+  type=type||'neutral';
   try{
-    const c=getCtx();
-    const freqMap={yes:[440,660,880],no:[220,196,174],maybe:[392,440,392],skip:[330,330],neutral:[440,660]};
-    const freqs=freqMap[type]||freqMap.neutral;
-    freqs.forEach((f,i)=>{
-      const o=c.createOscillator(),g=c.createGain();
-      o.connect(g);g.connect(c.destination);
-      o.type=type==='no'?'sawtooth':'sine';
-      o.frequency.value=f;
-      g.gain.setValueAtTime(.12,c.currentTime+i*.07);
-      g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.07+.18);
-      o.start(c.currentTime+i*.07);o.stop(c.currentTime+i*.07+.25);
+    var s=_sfxSetup(0.85);
+    var noteMap={
+      yes:[HIJAZ[10],HIJAZ[12],HIJAZ[14]],
+      no:[HIJAZ[7],HIJAZ[5],HIJAZ[2]],
+      maybe:[HIJAZ[8],HIJAZ[10],HIJAZ[8]],
+      skip:[HIJAZ[6],HIJAZ[7]],
+      neutral:[HIJAZ[7],HIJAZ[10]],
+    };
+    var notes=noteMap[type]||noteMap.neutral;
+    notes.forEach(function(freq,i){
+      playNay(s.c,s.rv,freq,0.38,0.28,s.t+i*0.11,5.5,0.008);
     });
   }catch(e){}
 }
+
+// كشف النتيجة — arpeggio ناي صاعد سحري
 function sfxReveal(){
   try{
-    const c=getCtx();
-    // Magic sweep
-    [261,330,392,523,659,784,1046].forEach((f,i)=>{
-      const o=c.createOscillator(),g=c.createGain();
-      o.connect(g);g.connect(c.destination);o.type='triangle';
-      o.frequency.setValueAtTime(f*.5,c.currentTime+i*.1);
-      o.frequency.linearRampToValueAtTime(f,c.currentTime+i*.1+.3);
-      g.gain.setValueAtTime(.18,c.currentTime+i*.1);
-      g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.1+.7);
-      o.start(c.currentTime+i*.1);o.stop(c.currentTime+i*.1+.8);
+    var s=_sfxSetup(1.0);
+    [0,2,4,6,7,9,11,12,14].forEach(function(ni,i){
+      playNay(s.c,s.rv,HIJAZ[ni],0.9,0.32-i*0.02,s.t+i*0.13,5,0.007);
+      if(i%2===0) playBellTone(s.c,s.rv,HIJAZ[ni]*2,0.6,0.10,s.t+i*0.13+0.05);
     });
-    // Deep magic bass
-    const ob=c.createOscillator(),gb=c.createGain();
-    ob.connect(gb);gb.connect(c.destination);ob.type='sine';
-    ob.frequency.setValueAtTime(80,c.currentTime);
-    ob.frequency.exponentialRampToValueAtTime(40,c.currentTime+2);
-    gb.gain.setValueAtTime(.2,c.currentTime);gb.gain.exponentialRampToValueAtTime(.0001,c.currentTime+2);
-    ob.start(c.currentTime);ob.stop(c.currentTime+2);
+    setTimeout(function(){playDrone(s.c,s.rv,HIJAZ[0]*0.25,3.0,0.30,s.c.currentTime);},1400);
+    setTimeout(function(){playNay(s.c,s.rv,HIJAZ[14],3.5,0.35,s.c.currentTime,4.5,0.012);},1700);
   }catch(e){}
 }
+
+// خطأ — ناي هابط حزين
 function sfxWrong(){
-  try{const c=getCtx();[220,196,174].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.09,c.currentTime+i*.18);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.18+.35);o.start(c.currentTime+i*.18);o.stop(c.currentTime+i*.18+.4);});}catch(e){}
+  try{
+    var s=_sfxSetup(0.8);
+    [HIJAZ[7],HIJAZ[5],HIJAZ[2],HIJAZ[0]].forEach(function(freq,i){
+      playNay(s.c,s.rv,freq,0.55,0.26-i*0.04,s.t+i*0.18,4.5,0.006);
+    });
+    playDrone(s.c,s.dry,HIJAZ[0]*0.5,1.2,0.14,s.t+0.6);
+  }catch(e){}
 }
+
+// سحر عام — دوامة ناي + جرس
 function sfxMagic(){
   try{
-    const c=getCtx();
-    for(let i=0;i<8;i++){
-      const f=200+Math.random()*800;
-      const o=c.createOscillator(),g=c.createGain();
-      o.connect(g);g.connect(c.destination);o.type='sine';
-      o.frequency.setValueAtTime(f,c.currentTime+i*.15);
-      g.gain.setValueAtTime(.08,c.currentTime+i*.15);
-      g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.15+.4);
-      o.start(c.currentTime+i*.15);o.stop(c.currentTime+i*.15+.5);
-    }
+    var s=_sfxSetup(0.9);
+    [4,6,8,10,12,10,8,6,4,6,8,10].forEach(function(ni,i){
+      playNay(s.c,s.rv,HIJAZ[ni%HIJAZ.length],0.3,0.20,s.t+i*0.09,6,0.011);
+    });
+    [0,1,2,3,4].forEach(function(i){
+      playBellTone(s.c,s.rv,HIJAZ[Math.floor(Math.random()*HIJAZ.length)]*4,0.5,0.08,s.t+i*0.22);
+    });
   }catch(e){}
 }
 
