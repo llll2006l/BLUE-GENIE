@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
 <title>المارد الأزرق — يحزر قسمك</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -97,10 +97,10 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
 .qr-close{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;padding:11px 32px;border-radius:50px;cursor:pointer;transition:all .3s;}
 
 /* ===== CONTAINER ===== */
-.container{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 120px;max-width:480px;margin:0 auto;}
+.container{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 120px;max-width:480px;margin:0 auto;padding-top:max(env(safe-area-inset-top,0px),70px);}
 
 /* ===== INTRO ===== */
-#screen-intro{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;padding-top:20px;}
+#screen-intro{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;padding-top:0;}
 .genie-title{font-family:'Cinzel',serif;font-size:clamp(24px,7vw,36px);font-weight:900;color:#fff;letter-spacing:.06em;text-shadow:0 0 40px rgba(77,159,255,.9),0 0 80px rgba(77,159,255,.4);margin-bottom:4px;animation:title-glow 3s ease-in-out infinite alternate;}
 @keyframes title-glow{from{text-shadow:0 0 30px rgba(77,159,255,.8)}to{text-shadow:0 0 60px rgba(77,159,255,1),0 0 100px rgba(168,85,247,.5)}}
 .genie-sub{font-size:10px;color:var(--gold);letter-spacing:.28em;margin-bottom:20px;font-weight:300;}
@@ -244,6 +244,40 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
   .question-card{padding:18px 12px 14px;}
   .ans-btn{font-size:14px;padding:12px 12px;}
 }
+
+/* ===== SPLASH SCREEN ===== */
+#splash-screen{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+#splash-screen.fade-out{animation:splash-fade 1s ease forwards;}
+@keyframes splash-fade{to{opacity:0;pointer-events:none}}
+.splash-lamp-wrap{position:relative;width:200px;height:260px;display:flex;align-items:flex-end;justify-content:center;}
+.splash-lamp-body{width:160px;height:95px;background:linear-gradient(135deg,#5a3e00,#ffd700,#c8950c,#ffd700,#5a3e00);border-radius:50% 50% 30% 30%;position:relative;box-shadow:0 0 80px rgba(255,201,77,.9),0 0 160px rgba(255,201,77,.5);animation:sp-lp 2.5s ease-in-out infinite;}
+@keyframes sp-lp{0%,100%{box-shadow:0 0 60px rgba(255,201,77,.8),0 0 120px rgba(255,201,77,.4)}50%{box-shadow:0 0 120px rgba(255,201,77,1),0 0 240px rgba(255,201,77,.6)}}
+.splash-lamp-neck{position:absolute;top:-28px;left:50%;transform:translateX(-50%);width:20px;height:32px;background:linear-gradient(#ffd700,#a07000);border-radius:6px 6px 0 0;}
+.splash-lamp-handle{position:absolute;top:-50px;left:50%;transform:translateX(-50%);width:64px;height:26px;border:5px solid #c8950c;border-bottom:none;border-radius:32px 32px 0 0;}
+.splash-genie{position:absolute;bottom:82px;left:50%;transform:translateX(-50%);width:150px;height:205px;animation:sp-genie-hov 3s ease-in-out infinite;filter:drop-shadow(0 0 22px rgba(77,159,255,.9)) drop-shadow(0 0 45px rgba(37,99,255,.5));z-index:5;}
+@keyframes sp-genie-hov{0%,100%{transform:translateX(-50%) translateY(0) rotate(-2.5deg) scale(1)}50%{transform:translateX(-50%) translateY(-22px) rotate(2.5deg) scale(1.03)}}
+.splash-smoke-c{position:absolute;bottom:245px;left:50%;transform:translateX(-50%);width:100px;height:130px;pointer-events:none;}
+.splash-smoke-c div{position:absolute;bottom:0;border-radius:50%;filter:blur(9px);}
+.splash-smoke-c div:nth-child(1){width:18px;height:18px;left:41px;background:rgba(77,159,255,.7);animation:sp-smoke 2.5s ease-out infinite;}
+.splash-smoke-c div:nth-child(2){width:28px;height:28px;left:30px;background:rgba(168,85,247,.6);animation:sp-smoke 3.2s ease-out .5s infinite;}
+.splash-smoke-c div:nth-child(3){width:22px;height:22px;left:44px;background:rgba(6,182,212,.55);animation:sp-smoke 2.9s ease-out 1s infinite;}
+.splash-smoke-c div:nth-child(4){width:34px;height:34px;left:25px;background:rgba(37,99,255,.45);animation:sp-smoke 3.8s ease-out 1.6s infinite;}
+.splash-smoke-c div:nth-child(5){width:14px;height:14px;left:50px;background:rgba(255,201,77,.5);animation:sp-smoke 2.2s ease-out .8s infinite;}
+@keyframes sp-smoke{0%{transform:translateY(0) scale(.3);opacity:.9}50%{transform:translateY(-65px) translateX(8px) scale(1.2);opacity:.5}100%{transform:translateY(-125px) translateX(-4px) scale(2.2);opacity:0}}
+.splash-glow{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);width:220px;height:38px;background:radial-gradient(ellipse,rgba(255,201,77,.5),transparent 70%);border-radius:50%;}
+.splash-title{font-family:'Cinzel',serif;font-size:30px;font-weight:900;color:#fff;letter-spacing:.1em;margin-top:28px;text-shadow:0 0 40px rgba(77,159,255,1),0 0 80px rgba(77,159,255,.5);animation:sp-txt-in 1s 1.6s ease both;opacity:0;}
+.splash-sub{font-size:11px;color:var(--gold);letter-spacing:.3em;margin-top:7px;animation:sp-txt-in 1s 1.9s ease both;opacity:0;}
+@keyframes sp-txt-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ===== SVG GENIE IN GAME ===== */
+.genie-svg-wrap{width:72px;height:88px;flex-shrink:0;filter:drop-shadow(0 0 14px rgba(77,159,255,.8));animation:float-slow 3s ease-in-out infinite;}
+.genie-svg-wrap svg{width:72px;height:88px;overflow:visible;}
+/* smooth SVG path transitions */
+.genie-svg-wrap .gv-brow-l,
+.genie-svg-wrap .gv-brow-r,
+.genie-svg-wrap .gv-mouth,
+.genie-svg-wrap .gv-eye-l,
+.genie-svg-wrap .gv-eye-r{transition:d .4s ease,transform .4s ease;}
 </style>
 </head>
 <body>
@@ -251,6 +285,254 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
 <div class="bg-grad"></div>
 <div class="stars" id="stars"></div>
 <div class="fog"><div class="fog-layer"></div><div class="fog-layer"></div><div class="fog-layer"></div></div>
+
+<!-- ===== SPLASH SCREEN ===== -->
+<div id="splash-screen">
+  <div class="splash-lamp-wrap">
+    <div class="splash-smoke-c">
+      <div></div><div></div><div></div><div></div><div></div>
+    </div>
+    <svg class="splash-genie" viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- جسم المارد — تدرج أزرق غني -->
+        <radialGradient id="spBG" cx="38%" cy="25%" r="65%">
+          <stop offset="0%"  stop-color="#bfdbfe"/>
+          <stop offset="30%" stop-color="#3b82f6"/>
+          <stop offset="70%" stop-color="#1d4ed8"/>
+          <stop offset="100%" stop-color="#1e3a8a"/>
+        </radialGradient>
+        <!-- رأس المارد -->
+        <radialGradient id="spHG" cx="38%" cy="28%" r="62%">
+          <stop offset="0%"  stop-color="#dbeafe"/>
+          <stop offset="35%" stop-color="#60a5fa"/>
+          <stop offset="75%" stop-color="#2563ff"/>
+          <stop offset="100%" stop-color="#1d4ed8"/>
+        </radialGradient>
+        <!-- ذيل الدخان -->
+        <linearGradient id="spTail" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#2563ff" stop-opacity="1"/>
+          <stop offset="60%" stop-color="#1d4ed8" stop-opacity=".7"/>
+          <stop offset="100%" stop-color="#0ea5e9" stop-opacity=".1"/>
+        </linearGradient>
+        <!-- عمامة -->
+        <linearGradient id="spT1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"  stop-color="#a78bfa"/>
+          <stop offset="50%" stop-color="#7c3aed"/>
+          <stop offset="100%" stop-color="#4c1d95"/>
+        </linearGradient>
+        <linearGradient id="spT2" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="#c4b5fd"/>
+          <stop offset="100%" stop-color="#6d28d9"/>
+        </linearGradient>
+        <!-- وهج الجوهرة -->
+        <radialGradient id="spGem" cx="50%" cy="40%">
+          <stop offset="0%"  stop-color="#fff"/>
+          <stop offset="40%" stop-color="#fde68a"/>
+          <stop offset="100%" stop-color="#f59e0b"/>
+        </radialGradient>
+        <!-- ضوء على الجسم -->
+        <radialGradient id="spShine" cx="35%" cy="20%">
+          <stop offset="0%"  stop-color="rgba(255,255,255,.45)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+        </radialGradient>
+        <!-- توهج خارجي -->
+        <filter id="spGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="spShadow">
+          <feGaussianBlur stdDeviation="5"/>
+        </filter>
+        <filter id="spSoft">
+          <feGaussianBlur stdDeviation="2.5"/>
+        </filter>
+        <clipPath id="spHeadClip">
+          <ellipse cx="80" cy="75" rx="35" ry="32"/>
+        </clipPath>
+      </defs>
+
+      <!-- ظل أرضي -->
+      <ellipse cx="80" cy="212" rx="30" ry="9" fill="rgba(37,99,255,0.3)" filter="url(#spShadow)"/>
+
+      <!-- ذيل الدخان / جسم المارد السفلي -->
+      <path d="M80 185
+               C 55 185, 38 170, 40 150
+               C 42 132, 50 118, 55 105
+               C 60 92, 60 85, 80 83
+               C 100 85, 100 92, 105 105
+               C 110 118, 118 132, 120 150
+               C 122 170, 105 185, 80 185Z"
+            fill="url(#spTail)"/>
+
+      <!-- جسم المارد الرئيسي -->
+      <ellipse cx="80" cy="135" rx="32" ry="38" fill="url(#spBG)"/>
+      <!-- ضوء على الجسم -->
+      <ellipse cx="68" cy="118" rx="16" ry="20" fill="url(#spShine)"/>
+
+      <!-- زخارف الملابس — خط ذهبي -->
+      <path d="M55 120 Q80 115 105 120" stroke="rgba(255,201,77,.7)" stroke-width="1.5" fill="none"/>
+      <path d="M52 130 Q80 124 108 130" stroke="rgba(255,201,77,.5)" stroke-width="1" fill="none"/>
+      <!-- وشاح أمامي -->
+      <path d="M67 108 Q80 112 93 108 L95 145 Q80 150 65 145Z" fill="rgba(99,102,241,.35)"/>
+      <path d="M67 108 Q80 112 93 108" stroke="rgba(255,201,77,.8)" stroke-width="1.5" fill="none"/>
+
+      <!-- ذراع يمين (يسار المشاهد) -->
+      <path d="M48 125 C 30 120, 18 110, 15 95 C 13 82, 20 72, 30 75"
+            stroke="url(#spBG)" stroke-width="16" fill="none" stroke-linecap="round"/>
+      <path d="M48 125 C 30 120, 18 110, 15 95 C 13 82, 20 72, 30 75"
+            stroke="rgba(255,255,255,.12)" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <!-- كف يمين -->
+      <ellipse cx="30" cy="75" rx="10" ry="8" fill="url(#spBG)" transform="rotate(-20,30,75)"/>
+      <ellipse cx="30" cy="75" rx="7" ry="5" fill="rgba(255,255,255,.2)" transform="rotate(-20,30,75)"/>
+      <!-- أصابع -->
+      <path d="M23 68 Q20 62 23 58" stroke="#3b82f6" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M28 65 Q26 58 29 54" stroke="#3b82f6" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M34 65 Q33 58 37 55" stroke="#3b82f6" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+
+      <!-- ذراع يسار -->
+      <path d="M112 125 C 130 120, 142 110, 145 95 C 147 82, 140 72, 130 75"
+            stroke="url(#spBG)" stroke-width="16" fill="none" stroke-linecap="round"/>
+      <path d="M112 125 C 130 120, 142 110, 145 95 C 147 82, 140 72, 130 75"
+            stroke="rgba(255,255,255,.12)" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <!-- كف يسار -->
+      <ellipse cx="130" cy="75" rx="10" ry="8" fill="url(#spBG)" transform="rotate(20,130,75)"/>
+      <ellipse cx="130" cy="75" rx="7" ry="5" fill="rgba(255,255,255,.2)" transform="rotate(20,130,75)"/>
+      <!-- أصابع -->
+      <path d="M137 68 Q140 62 137 58" stroke="#3b82f6" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M132 65 Q134 58 131 54" stroke="#3b82f6" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+      <path d="M126 65 Q127 58 123 55" stroke="#3b82f6" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+
+      <!-- رقبة -->
+      <rect x="71" y="96" width="18" height="16" rx="6" fill="#1d4ed8"/>
+      <rect x="73" y="97" width="14" height="7" rx="4" fill="rgba(255,255,255,.15)"/>
+
+      <!-- رأس -->
+      <ellipse cx="80" cy="75" rx="35" ry="32" fill="url(#spHG)"/>
+      <!-- ضوء على الرأس -->
+      <ellipse cx="66" cy="62" rx="14" ry="10" fill="rgba(255,255,255,.22)" transform="rotate(-15,66,62)"/>
+
+      <!-- حاجبان -->
+      <path d="M53 58 Q62 52 70 56" stroke="#1e3a8a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M90 56 Q98 52 107 58" stroke="#1e3a8a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <!-- ظل تحت الحواجب -->
+      <path d="M53 60 Q62 55 70 58" stroke="rgba(0,0,60,.2)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M90 58 Q98 55 107 60" stroke="rgba(0,0,60,.2)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+      <!-- عيون — بياض العين -->
+      <ellipse cx="64" cy="68" rx="9" ry="10" fill="white"/>
+      <ellipse cx="96" cy="68" rx="9" ry="10" fill="white"/>
+      <!-- قزحية -->
+      <ellipse cx="65" cy="69" rx="6.5" ry="7.5" fill="#1e40af"/>
+      <ellipse cx="97" cy="69" rx="6.5" ry="7.5" fill="#1e40af"/>
+      <!-- حدقة -->
+      <ellipse cx="66" cy="70" rx="4" ry="4.5" fill="#050a20"/>
+      <ellipse cx="98" cy="70" rx="4" ry="4.5" fill="#050a20"/>
+      <!-- بريق العين -->
+      <ellipse cx="63" cy="66" rx="2.2" ry="2.5" fill="rgba(255,255,255,.9)"/>
+      <ellipse cx="95" cy="66" rx="2.2" ry="2.5" fill="rgba(255,255,255,.9)"/>
+      <ellipse cx="69" cy="72" rx="1" ry="1.2" fill="rgba(255,255,255,.5)"/>
+      <ellipse cx="101" cy="72" rx="1" ry="1.2" fill="rgba(255,255,255,.5)"/>
+
+      <!-- أنف -->
+      <path d="M77 78 Q80 82 83 78" stroke="rgba(29,78,216,.6)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+      <!-- شارب فارسي -->
+      <path d="M68 84 Q74 88 80 85 Q86 88 92 84" stroke="#1e3a8a" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <path d="M68 84 Q65 82 63 84" stroke="#1e3a8a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M92 84 Q95 82 97 84" stroke="#1e3a8a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+      <!-- ابتسامة عريضة -->
+      <path d="M67 90 Q80 100 93 90" stroke="#1e3a8a" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- لثّة -->
+      <path d="M67 90 Q80 100 93 90 Q90 93 80 94 Q70 93 67 90Z" fill="rgba(239,68,68,.3)"/>
+      <!-- أسنان -->
+      <path d="M71 91 Q80 97 89 91" stroke="rgba(255,255,255,.5)" stroke-width="1.5" fill="rgba(255,255,255,.25)"/>
+
+      <!-- أذنان -->
+      <ellipse cx="45" cy="75" rx="7" ry="9" fill="url(#spHG)"/>
+      <ellipse cx="45" cy="75" rx="4" ry="6" fill="rgba(29,78,216,.4)"/>
+      <ellipse cx="115" cy="75" rx="7" ry="9" fill="url(#spHG)"/>
+      <ellipse cx="115" cy="75" rx="4" ry="6" fill="rgba(29,78,216,.4)"/>
+
+      <!-- حلقات أذن ذهبية مع جوهرة -->
+      <circle cx="44" cy="84" r="6" fill="none" stroke="#ffd700" stroke-width="2.5"/>
+      <circle cx="44" cy="84" r="3" fill="#ffd700"/>
+      <circle cx="44" cy="84" r="1.5" fill="#fff" opacity=".8"/>
+      <circle cx="116" cy="84" r="6" fill="none" stroke="#ffd700" stroke-width="2.5"/>
+      <circle cx="116" cy="84" r="3" fill="#ffd700"/>
+      <circle cx="116" cy="84" r="1.5" fill="#fff" opacity=".8"/>
+
+      <!-- عمامة — طبقة تحتية -->
+      <ellipse cx="80" cy="46" rx="34" ry="16" fill="url(#spT1)"/>
+      <!-- عمامة — لفّة أمامية -->
+      <path d="M46 46 Q80 32 114 46 Q110 56 80 58 Q50 56 46 46Z" fill="url(#spT2)"/>
+      <!-- خط زخرفي على العمامة -->
+      <path d="M52 48 Q80 38 108 48" stroke="rgba(255,201,77,.6)" stroke-width="1.5" fill="none"/>
+      <path d="M55 52 Q80 43 105 52" stroke="rgba(255,201,77,.35)" stroke-width="1" fill="none"/>
+      <!-- ظل على العمامة -->
+      <ellipse cx="80" cy="55" rx="28" ry="5" fill="rgba(0,0,50,.2)"/>
+
+      <!-- قمة العمامة -->
+      <ellipse cx="80" cy="33" rx="16" ry="10" fill="url(#spT1)"/>
+      <ellipse cx="80" cy="31" rx="12" ry="8" fill="url(#spT2)"/>
+
+      <!-- قاعدة الجوهرة -->
+      <path d="M72 23 L80 16 L88 23 L84 30 L76 30Z" fill="#ffd700"/>
+      <path d="M73 24 L80 18 L87 24 L83 29 L77 29Z" fill="url(#spGem)"/>
+      <!-- بريق الجوهرة -->
+      <path d="M80 18 L77 24 L80 27 L83 24Z" fill="rgba(255,255,255,.8)"/>
+      <!-- أشعة الجوهرة المتحركة -->
+      <line x1="80" y1="13" x2="80" y2="9" stroke="#ffd700" stroke-width="2" stroke-linecap="round" opacity=".9">
+        <animate attributeName="opacity" values=".9;.2;.9" dur="1.5s" repeatCount="indefinite"/>
+      </line>
+      <line x1="86" y1="15" x2="89" y2="12" stroke="#ffd700" stroke-width="2" stroke-linecap="round" opacity=".7">
+        <animate attributeName="opacity" values=".7;.1;.7" dur="1.5s" begin=".2s" repeatCount="indefinite"/>
+      </line>
+      <line x1="74" y1="15" x2="71" y2="12" stroke="#ffd700" stroke-width="2" stroke-linecap="round" opacity=".7">
+        <animate attributeName="opacity" values=".7;.1;.7" dur="1.5s" begin=".4s" repeatCount="indefinite"/>
+      </line>
+      <line x1="88" y1="22" x2="92" y2="21" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round" opacity=".6">
+        <animate attributeName="opacity" values=".6;.05;.6" dur="1.5s" begin=".6s" repeatCount="indefinite"/>
+      </line>
+      <line x1="72" y1="22" x2="68" y2="21" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round" opacity=".6">
+        <animate attributeName="opacity" values=".6;.05;.6" dur="1.5s" begin=".8s" repeatCount="indefinite"/>
+      </line>
+
+      <!-- توهج سحري حول المارد كله -->
+      <ellipse cx="80" cy="120" rx="36" ry="72" fill="none" stroke="rgba(77,159,255,.15)" stroke-width="3"/>
+      <ellipse cx="80" cy="120" rx="40" ry="76" fill="none" stroke="rgba(77,159,255,.08)" stroke-width="2"/>
+
+      <!-- جزيئات سحرية صغيرة متحركة -->
+      <circle cx="40" cy="100" r="2.5" fill="#60a5fa" opacity="0">
+        <animate attributeName="opacity" values="0;.8;0" dur="2s" begin="0s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="100;85;100" dur="2s" begin="0s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="118" cy="110" r="2" fill="#a78bfa" opacity="0">
+        <animate attributeName="opacity" values="0;.7;0" dur="2.5s" begin=".6s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="110;92;110" dur="2.5s" begin=".6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="55" cy="145" r="1.8" fill="#ffd700" opacity="0">
+        <animate attributeName="opacity" values="0;.9;0" dur="1.8s" begin="1s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="145;128;145" dur="1.8s" begin="1s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="105" cy="155" r="2" fill="#06b6d4" opacity="0">
+        <animate attributeName="opacity" values="0;.6;0" dur="2.2s" begin=".3s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="155;138;155" dur="2.2s" begin=".3s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="130" cy="130" r="1.5" fill="#f472b6" opacity="0">
+        <animate attributeName="opacity" values="0;.7;0" dur="1.6s" begin="1.4s" repeatCount="indefinite"/>
+        <animate attributeName="cy" values="130;115;130" dur="1.6s" begin="1.4s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+    <div class="splash-lamp-body">
+      <div class="splash-lamp-neck"></div>
+      <div class="splash-lamp-handle"></div>
+    </div>
+    <div class="splash-glow"></div>
+  </div>
+  <div class="splash-title">المارد الأزرق</div>
+  <div class="splash-sub">GENIE OF KNOWLEDGE</div>
+</div>
 
 <!-- Reveal overlay -->
 <div class="reveal-overlay" id="reveal-overlay"></div>
@@ -272,7 +554,7 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
   </div>
 </div>
 
-<button class="music-btn" id="music-btn" onclick="toggleMusic()">🔊</button>
+<button class="music-btn" id="music-btn" onclick="toggleMusic()">🔇</button>
 <button class="qr-fab" onclick="openQR()">📲</button>
 
 <div class="qr-modal" id="qr-modal" onclick="closeQR(event)">
@@ -337,7 +619,49 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
     <div class="progress-label" id="prog-label">السؤال 1</div>
 
     <div class="genie-game-wrap">
-      <div class="genie-game-face" id="genie-face">🧞</div>
+      <div class="genie-svg-wrap" id="genie-face">
+        <svg id="game-genie-svg" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="ggBodyG" cx="40%" cy="30%"><stop offset="0%" stop-color="#60a5fa"/><stop offset="65%" stop-color="#2563ff"/><stop offset="100%" stop-color="#1d4ed8"/></radialGradient>
+            <radialGradient id="ggHeadG" cx="40%" cy="30%"><stop offset="0%" stop-color="#93c5fd"/><stop offset="55%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#1d4ed8"/></radialGradient>
+            <linearGradient id="ggHat1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#4c1d95"/></linearGradient>
+            <linearGradient id="ggHat2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#6d28d9"/></linearGradient>
+            <filter id="ggBlur"><feGaussianBlur stdDeviation="3"/></filter>
+          </defs>
+          <ellipse cx="60" cy="152" rx="20" ry="9" fill="rgba(37,99,255,0.25)" filter="url(#ggBlur)"/>
+          <path d="M60 132 Q36 120 39 105 Q43 89 60 87 Q77 89 81 105 Q84 120 60 132Z" fill="url(#ggBodyG)"/>
+          <ellipse cx="60" cy="100" rx="24" ry="28" fill="url(#ggBodyG)"/>
+          <path d="M36 94 Q21 87 23 76 Q25 65 36 70" stroke="#4d9fff" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M84 94 Q99 87 97 76 Q95 65 84 70" stroke="#4d9fff" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <circle cx="22" cy="73" r="6.5" fill="#2563ff"/>
+          <circle cx="98" cy="73" r="6.5" fill="#2563ff"/>
+          <rect x="52" y="67" width="16" height="13" rx="5" fill="#1d4ed8"/>
+          <ellipse cx="60" cy="52" rx="27" ry="25" fill="url(#ggHeadG)"/>
+          <ellipse cx="47" cy="42" rx="8" ry="5" fill="rgba(255,255,255,0.14)" transform="rotate(-20,47,42)"/>
+          <!-- Eyes -->
+          <ellipse class="gv-eye-l" cx="47" cy="49" rx="5.5" ry="6.5" fill="#fff"/>
+          <ellipse class="gv-pupil-l" cx="48.5" cy="50" rx="3.2" ry="3.8" fill="#0a0a1a"/>
+          <ellipse class="gv-eye-r" cx="73" cy="49" rx="5.5" ry="6.5" fill="#fff"/>
+          <ellipse class="gv-pupil-r" cx="71.5" cy="50" rx="3.2" ry="3.8" fill="#0a0a1a"/>
+          <!-- Eyebrows — will be changed by JS -->
+          <path id="gg-brow-l" d="M40 39 Q47 35 54 38" stroke="#1a3a8a" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          <path id="gg-brow-r" d="M66 38 Q73 35 80 39" stroke="#1a3a8a" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          <!-- Nose -->
+          <ellipse cx="60" cy="56" rx="3.8" ry="2.8" fill="rgba(29,78,216,0.35)"/>
+          <!-- Mouth — will be changed by JS -->
+          <path id="gg-mouth" d="M49 64 Q60 70 71 64" stroke="#1a3a8a" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+          <!-- Mustache -->
+          <path d="M51 61 Q56 63.5 60 61 Q64 63.5 69 61" stroke="#1a3a8a" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Turban -->
+          <ellipse cx="60" cy="29" rx="23" ry="10" fill="url(#ggHat1)"/>
+          <ellipse cx="60" cy="27" rx="15" ry="8" fill="url(#ggHat2)"/>
+          <circle cx="60" cy="18" r="6" fill="#ffd700"/>
+          <circle cx="60" cy="18" r="3" fill="#fff" opacity=".85"/>
+          <!-- Earrings -->
+          <circle cx="33" cy="55" r="4" fill="none" stroke="#ffd700" stroke-width="2"/>
+          <circle cx="87" cy="55" r="4" fill="none" stroke="#ffd700" stroke-width="2"/>
+        </svg>
+      </div>
       <div class="genie-feeling-bubble" id="genie-bubble">همم... دعني أفكر قليلاً...</div>
     </div>
 
@@ -378,6 +702,111 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
 </div>
 
 <script>
+// ============================================================
+//  SPLASH SCREEN — يختفي بعد 3.5 ثانية
+// ============================================================
+(function(){
+  function playSplashSound(){
+    try{
+      const ctx=new(window.AudioContext||window.webkitAudioContext)();
+      // موجة سحرية صاعدة
+      [180,240,320,420,540,680,860,1080].forEach((f,i)=>{
+        const o=ctx.createOscillator(),g=ctx.createGain(),flt=ctx.createBiquadFilter();
+        flt.type='lowpass';flt.frequency.value=2000;
+        o.connect(flt);flt.connect(g);g.connect(ctx.destination);
+        o.type=i%2?'triangle':'sine';
+        o.frequency.setValueAtTime(f*.5,ctx.currentTime+i*.2);
+        o.frequency.linearRampToValueAtTime(f,ctx.currentTime+i*.2+.5);
+        g.gain.setValueAtTime(0,ctx.currentTime+i*.2);
+        g.gain.linearRampToValueAtTime(.07,ctx.currentTime+i*.2+.08);
+        g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+i*.2+.9);
+        o.start(ctx.currentTime+i*.2);o.stop(ctx.currentTime+i*.2+1);
+      });
+      // دقة عميقة
+      const ob=ctx.createOscillator(),gb=ctx.createGain();
+      ob.connect(gb);gb.connect(ctx.destination);ob.type='sine';
+      ob.frequency.setValueAtTime(50,ctx.currentTime);
+      ob.frequency.linearRampToValueAtTime(85,ctx.currentTime+2.8);
+      gb.gain.setValueAtTime(.14,ctx.currentTime);
+      gb.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+3.2);
+      ob.start(ctx.currentTime);ob.stop(ctx.currentTime+3.5);
+    }catch(e){}
+  }
+
+  // محاولة تشغيل الصوت عند أول تفاعل
+  let soundPlayed=false;
+  function trySound(){if(!soundPlayed){soundPlayed=true;playSplashSound();}}
+  document.addEventListener('touchstart',trySound,{once:true});
+  document.addEventListener('click',trySound,{once:true});
+  setTimeout(trySound,200);
+
+  // إخفاء السبلاش بعد 3.5 ث
+  setTimeout(()=>{
+    const sp=document.getElementById('splash-screen');
+    if(sp){sp.classList.add('fade-out');setTimeout(()=>sp.style.display='none',1050);}
+  },3500);
+})();
+
+// ============================================================
+//  SVG GENIE FACE — يغير تعابير الوجه حسب الحالة
+// ============================================================
+// الحالات: neutral | close | far | sure | thinking
+const GENIE_FACE_DATA={
+  neutral:{
+    browL:'M40 39 Q47 35 54 38',       // حاجب عادي
+    browR:'M66 38 Q73 35 80 39',
+    eyeScaleY:1,                        // عين طبيعية
+    mouth:'M49 64 Q60 70 71 64',        // ابتسامة خفيفة
+    pupils:{lx:48.5,ly:50,rx:71.5,ry:50}
+  },
+  close:{  // قريب من الإجابة — عابس/مركّز
+    browL:'M40 37 Q47 40 54 37',        // حاجب منخفض ومقطّب
+    browR:'M66 37 Q73 40 80 37',
+    eyeScaleY:.85,
+    mouth:'M50 66 Q60 63 70 66',        // فم مكفهر قليلاً
+    pupils:{lx:48.5,ly:50.5,rx:71.5,ry:50.5}
+  },
+  far:{    // بعيد — متعجب/مندهش
+    browL:'M40 35 Q47 29 54 33',        // حاجب مرفوع للأعلى
+    browR:'M66 33 Q73 29 80 35',
+    eyeScaleY:1.2,                      // عين واسعة
+    mouth:'M51 63 Q60 73 69 63',        // فم مفتوح دائري
+    pupils:{lx:48.5,ly:50,rx:71.5,ry:50}
+  },
+  sure:{   // متأكد — مبتسم واثق
+    browL:'M40 40 Q47 36 54 39',
+    browR:'M66 39 Q73 36 80 40',
+    eyeScaleY:.9,
+    mouth:'M47 63 Q60 73 73 63',        // ابتسامة عريضة
+    pupils:{lx:48.5,ly:50,rx:71.5,ry:50}
+  },
+  thinking:{  // يفكر — حاجب واحد مرفوع
+    browL:'M40 38 Q47 35 52 38',
+    browR:'M68 35 Q73 31 80 39',        // حاجب يمين مرفوع
+    eyeScaleY:1,
+    mouth:'M50 65 Q55 64 60 65 Q65 64 70 66',  // فم متذبذب
+    pupils:{lx:47,ly:50.5,rx:70,ry:50.5}       // عيون تحت
+  }
+};
+
+function updateGenieFace(mood){
+  const d=GENIE_FACE_DATA[mood]||GENIE_FACE_DATA.neutral;
+  const browL=document.getElementById('gg-brow-l');
+  const browR=document.getElementById('gg-brow-r');
+  const mouth=document.getElementById('gg-mouth');
+  const eyeL=document.querySelector('.gv-eye-l');
+  const eyeR=document.querySelector('.gv-eye-r');
+  const pupilL=document.querySelector('.gv-pupil-l');
+  const pupilR=document.querySelector('.gv-pupil-r');
+  if(!browL)return;
+  browL.setAttribute('d',d.browL);
+  browR.setAttribute('d',d.browR);
+  mouth.setAttribute('d',d.mouth);
+  if(eyeL)eyeL.setAttribute('ry', 6.5*d.eyeScaleY);
+  if(eyeR)eyeR.setAttribute('ry', 6.5*d.eyeScaleY);
+  if(pupilL){pupilL.setAttribute('cx',d.pupils.lx);pupilL.setAttribute('cy',d.pupils.ly);}
+  if(pupilR){pupilR.setAttribute('cx',d.pupils.rx);pupilR.setAttribute('cy',d.pupils.ry);}
+}
 // ============================================================
 //  STARS + SHOOTING STARS
 // ============================================================
@@ -465,7 +894,10 @@ function stopMusic(){
   musicPlaying=false;clearTimeout(melodyTimeout);clearTimeout(bassTimeout);
   document.getElementById('music-btn').textContent='🔇';
 }
-function toggleMusic(){if(musicPlaying)stopMusic();else startMusic();}
+function toggleMusic(){
+  if(musicPlaying)stopMusic();
+  else{const ctx=getCtx();if(ctx.state==='suspended')ctx.resume().then(()=>startMusic());else startMusic();}
+}
 
 // ============================================================
 //  SFX
@@ -741,10 +1173,10 @@ function getGenieFace(scores){
   const vals=Object.values(scores);
   const max=Math.max(...vals),total=vals.reduce((a,b)=>a+b,0)||1;
   const pct=max/total;
-  if(pct>.6)return{face:'😎',bubble:getConfidentSpeech()};
-  if(pct>.45)return{face:'😊',bubble:getCloseSpeech()};
-  if(pct>.3)return{face:'🤔',bubble:getNeutralSpeech()};
-  return{face:'😮',bubble:getFarSpeech()};
+  if(pct>.6)return{mood:'sure',bubble:getConfidentSpeech()};
+  if(pct>.45)return{mood:'close',bubble:getCloseSpeech()};
+  if(pct>.3)return{mood:'neutral',bubble:getNeutralSpeech()};
+  return{mood:'far',bubble:getFarSpeech()};
 }
 
 // ============================================================
@@ -821,6 +1253,7 @@ function startGame(){
   document.getElementById('screen-intro').style.display='none';
   document.getElementById('screen-game').style.display='block';
   document.getElementById('lamp-fixed').style.display='block';
+  updateGenieFace('neutral');
   renderQuestion();
 }
 
@@ -839,8 +1272,8 @@ function renderQuestion(){
   backBtn.style.display=history.length>0?'flex':'none';
 
   // Genie face + bubble
-  const{face,bubble}=getGenieFace(scores);
-  document.getElementById('genie-face').textContent=face;
+  const{mood,bubble}=getGenieFace(scores);
+  updateGenieFace(mood);
   document.getElementById('genie-bubble').textContent=bubble;
 
   // Fun phrase (random, no repeat until exhausted)
@@ -912,16 +1345,15 @@ function handleAnswer(optIdx){
   });
   qIndex++;
 
-  // Thinking animation
-  const{face}=getGenieFace(scores);
+  // Thinking animation — show thinking face on existing genie SVG
+  updateGenieFace('thinking');
+  const{mood}=getGenieFace(scores);
   document.getElementById('question-area').innerHTML=`
     <div class="thinking-wrap">
-      <div class="thinking-genie">${face}</div>
-      <div class="thinking-dots"><span></span><span></span><span></span></div>
+      <div class="thinking-dots" style="margin-top:12px;"><span></span><span></span><span></span></div>
       <div class="thinking-text">${rand(GENIE_NEUTRAL)}</div>
     </div>`;
-
-  setTimeout(renderQuestion,900);
+  setTimeout(()=>{updateGenieFace(mood);renderQuestion();},900);
 }
 
 function goBack(){
