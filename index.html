@@ -884,90 +884,122 @@ function openQR(){
 function closeQR(e){if(!e||e.target===document.getElementById('qr-modal'))document.getElementById('qr-modal').classList.remove('open');}
 
 // ============================================================
-//  MUSIC — سحر صوتي غامض (مقام مينور شرقي + ريفيرب + أجواء)
+//  MUSIC — Web Audio
 // ============================================================
 let audioCtx=null,musicPlaying=false;
-let musicNodes=[];
-let musicTimeouts=[];
+let melodyTimeout=null,bassTimeout=null,percTimeout=null;
 
-function getCtx(){
-  if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-  return audioCtx;
+const SCALE=[220,246.94,261.63,293.66,329.63,349.23,392,440,493.88,523.25,587.33,659.25,698.46,783.99,880];
+const MELODY=[[9,.5],[9,.25],[10,.25],[11,.5],[9,.5],[11,.5],[11,.25],[12,.25],[11,.5],[9,.5],[7,.5],[7,.25],[9,.25],[11,1],[9,.5],[7,.5],[5,.5],[4,.5],[5,.5],[5,.25],[7,.25],[9,.5],[7,.5],[4,.5],[4,.25],[5,.25],[7,.5],[5,.5],[2,.5],[4,.5],[5,.5],[7,.5],[5,.5],[4,.5],[2,.5],[0,1]];
+const BASS=[[0,1],[2,1],[4,1],[5,1],[0,1],[2,1],[4,1],[7,1]];
+
+function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+function playNote(freq,dur,gain,type,ctx,when){
+  const o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+  f.type='lowpass';f.frequency.value=2800;
+  o.connect(f);f.connect(g);g.connect(ctx.destination);
+  o.type=type;o.frequency.setValueAtTime(freq,when);
+  g.gain.setValueAtTime(0,when);g.gain.linearRampToValueAtTime(gain,when+.02);
+  g.gain.setValueAtTime(gain,when+dur*.7);g.gain.exponentialRampToValueAtTime(.0001,when+dur);
+  o.start(when);o.stop(when+dur+.05);
+}
+function scheduleMelody(t,bpm){
+  if(!musicPlaying)return;
+  const ctx=getCtx(),beat=60/bpm;
+  MELODY.forEach(([idx,beats])=>{playNote(SCALE[idx],beats*beat*.92,.10,'sine',ctx,t);t+=beats*beat;});
+  const len=MELODY.reduce((a,[,b])=>a+b,0)*beat;
+  melodyTimeout=setTimeout(()=>scheduleMelody(ctx.currentTime,bpm),len*1000-80);
+}
+function scheduleBass(t,bpm){
+  if(!musicPlaying)return;
+  const ctx=getCtx(),beat=60/bpm;
+  BASS.forEach(([idx,beats])=>{playNote(SCALE[idx]/2,beats*beat*.8,.06,'triangle',ctx,t);t+=beats*beat;});
+  const len=BASS.reduce((a,[,b])=>a+b,0)*beat;
+  bassTimeout=setTimeout(()=>scheduleBass(ctx.currentTime,bpm),len*1000-40);
+}
+function startMusic(){
+  if(musicPlaying)return;musicPlaying=true;
+  const ctx=getCtx();if(ctx.state==='suspended')ctx.resume();
+  scheduleMelody(ctx.currentTime+.1,88);scheduleBass(ctx.currentTime+.1,88);
+  document.getElementById('music-btn').textContent='🔊';
+}
+function stopMusic(){
+  musicPlaying=false;clearTimeout(melodyTimeout);clearTimeout(bassTimeout);
+  document.getElementById('music-btn').textContent='🔇';
+}
+function toggleMusic(){
+  if(musicPlaying)stopMusic();
+  else{const ctx=getCtx();if(ctx.state==='suspended')ctx.resume().then(()=>startMusic());else startMusic();}
 }
 
-// ── Reverb Convolver ──────────────────────────────────────────
-function makeReverb(ctx,duration=3.5,decay=2.2){
-  const sr=ctx.sampleRate,len=sr*duration;
-  const buf=ctx.createBuffer(2,len,sr);
-  for(let ch=0;ch<2;ch++){
-    const d=buf.getChannelData(ch);
-    for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);
-  }
-  const conv=ctx.createConvolver();conv.buffer=buf;
-  return conv;
+// ============================================================
+//  SFX
+// ============================================================
+function sfxClick(type='neutral'){
+  try{
+    const c=getCtx();
+    const freqMap={yes:[440,660,880],no:[220,196,174],maybe:[392,440,392],skip:[330,330],neutral:[440,660]};
+    const freqs=freqMap[type]||freqMap.neutral;
+    freqs.forEach((f,i)=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);
+      o.type=type==='no'?'sawtooth':'sine';
+      o.frequency.value=f;
+      g.gain.setValueAtTime(.12,c.currentTime+i*.07);
+      g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.07+.18);
+      o.start(c.currentTime+i*.07);o.stop(c.currentTime+i*.07+.25);
+    });
+  }catch(e){}
+}
+function sfxReveal(){
+  try{
+    const c=getCtx();
+    // Magic sweep
+    [261,330,392,523,659,784,1046].forEach((f,i)=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);o.type='triangle';
+      o.frequency.setValueAtTime(f*.5,c.currentTime+i*.1);
+      o.frequency.linearRampToValueAtTime(f,c.currentTime+i*.1+.3);
+      g.gain.setValueAtTime(.18,c.currentTime+i*.1);
+      g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.1+.7);
+      o.start(c.currentTime+i*.1);o.stop(c.currentTime+i*.1+.8);
+    });
+    // Deep magic bass
+    const ob=c.createOscillator(),gb=c.createGain();
+    ob.connect(gb);gb.connect(c.destination);ob.type='sine';
+    ob.frequency.setValueAtTime(80,c.currentTime);
+    ob.frequency.exponentialRampToValueAtTime(40,c.currentTime+2);
+    gb.gain.setValueAtTime(.2,c.currentTime);gb.gain.exponentialRampToValueAtTime(.0001,c.currentTime+2);
+    ob.start(c.currentTime);ob.stop(c.currentTime+2);
+  }catch(e){}
+}
+function sfxWrong(){
+  try{const c=getCtx();[220,196,174].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.09,c.currentTime+i*.18);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.18+.35);o.start(c.currentTime+i*.18);o.stop(c.currentTime+i*.18+.4);});}catch(e){}
+}
+function sfxMagic(){
+  try{
+    const c=getCtx();
+    for(let i=0;i<8;i++){
+      const f=200+Math.random()*800;
+      const o=c.createOscillator(),g=c.createGain();
+      o.connect(g);g.connect(c.destination);o.type='sine';
+      o.frequency.setValueAtTime(f,c.currentTime+i*.15);
+      g.gain.setValueAtTime(.08,c.currentTime+i*.15);
+      g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+i*.15+.4);
+      o.start(c.currentTime+i*.15);o.stop(c.currentTime+i*.15+.5);
+    }
+  }catch(e){}
 }
 
-// ── مقام حجاز (شرقي غامض): C D♭ E F G A♭ B C ──────────────
-// الترددات بالهرتز — أوكتاف منخفض للغموض
-const HIJAZ_FREQS=[
-  130.81, // C2
-  138.59, // D♭2
-  164.81, // E2
-  174.61, // F2
-  196.00, // G2
-  207.65, // A♭2
-  246.94, // B2
-  261.63, // C3
-  277.18, // D♭3
-  329.63, // E3
-  349.23, // F3
-  392.00, // G3
-  415.30, // A♭3
-  493.88, // B3
-  523.25, // C4
-  554.37, // D♭4
-  659.25, // E4
-];
-
-// لحن غامض هادئ — نوتات مختارة من المقام
-const MYSTIC_MELODY=[
-  [7,1.5],[8,0.5],[10,1],[9,0.5],[7,0.5],[6,1],[4,1],
-  [5,0.5],[7,0.5],[8,1],[10,0.5],[9,0.5],[7,1.5],[6,0.5],
-  [4,1],[2,1],[1,0.5],[2,0.5],[4,1],[5,0.5],[4,0.5],
-  [2,1.5],[1,0.5],[0,2],
-  [7,1],[9,0.5],[10,0.5],[12,1],[10,0.5],[9,0.5],
-  [8,1],[7,0.5],[6,0.5],[4,1.5],[2,0.5],[1,2],
-];
-
-// باس عميق دائري
-const DRONE_NOTES=[0,4,0,6,4,0,2,0];
-
-function playMysticNote(ctx,dest,freq,dur,vol,type,when,attackT=0.08,releaseRatio=0.75){
-  const osc=ctx.createOscillator();
-  const gain=ctx.createGain();
-  const filt=ctx.createBiquadFilter();
-
-  filt.type='bandpass';
-  filt.frequency.value=freq*2.2;
-  filt.Q.value=1.8;
-
-  osc.connect(filt);filt.connect(gain);gain.connect(dest);
-  osc.type=type;
-  osc.frequency.setValueAtTime(freq,when);
-  // تأرجح طفيف (vibrato)
-  const vibRate=4.5,vibDepth=freq*0.006;
-  osc.frequency.setValueAtTime(freq,when+0.15);
-  for(let i=0;i<Math.ceil(dur*vibRate);i++){
-    const t=when+0.15+i/vibRate;
-    osc.frequency.setValueAtTime(freq+Math.sin(i*Math.PI)*vibDepth,t);
-  }
-  gain.gain.setValueAtTime(0,when);
-  gain.gain.linearRampToValueAtTime(vol,when+attackT);
-  gain.gain.setValueAtTime(vol,when+dur*releaseRatio);
-  gain.gain.exponentialRampToValueAtTime(0.0001,when+dur);
-  osc.start(when);osc.stop(when+dur+0.1);
+// ============================================================
+//  RIPPLE
+// ============================================================
+function addRipple(btn,e){
+  const r=document.createElement('span');r.className='ripple';
+  const rect=btn.getBoundingClientRect(),size=Math.max(rect.width,rect.height);
+  r.style.cssText=`width:${size}px;height:${size}px;left:${(e.clientX||rect.left+50)-rect.left-size/2}px;top:${(e.clientY||rect.top+25)-rect.top-size/2}px;`;
+  btn.appendChild(r);setTimeout(()=>r.remove(),600);
 }
-
 
 // ============================================================
 //  DATA
