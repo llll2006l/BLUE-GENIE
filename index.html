@@ -2,7 +2,10 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>المارد الأزرق — يحزر قسمك</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -13,7 +16,9 @@
   --smoke:#a0b4d0;--card:#070c1a;--border:#0d1a35;--text:#c8d8f0;
   --green:#22c55e;--red:#ef4444;--purple:#a855f7;--cyan:#06b6d4;
 }
-html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif;color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif;color:var(--text);overflow-x:clip;-webkit-font-smoothing:antialiased;}
+html{overflow-y:auto;}
+body{overflow-y:auto;}
 
 /* ===== ANIMATED BACKGROUND ===== */
 .bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
@@ -97,10 +102,18 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
 .qr-close{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;padding:11px 32px;border-radius:50px;cursor:pointer;transition:all .3s;}
 
 /* ===== CONTAINER ===== */
-.container{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 120px;max-width:480px;margin:0 auto;padding-top:max(env(safe-area-inset-top,0px),70px);}
+.container{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 120px;max-width:480px;margin:0 auto;padding-top:max(env(safe-area-inset-top,0px),60px);}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{padding-top:env(safe-area-inset-top,0px);}
 
 /* ===== INTRO ===== */
 #screen-intro{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;padding-top:0;}
+/* نضمن ظهور المارد كاملاً فوق المصباح */
+#screen-intro .lamp-scene > div:first-child{margin-top:100px !important;}
+@media(max-width:768px){
+  #screen-intro .lamp-scene > div:first-child{margin-top:110px !important;}
+  .container{padding-top:max(env(safe-area-inset-top,0px),40px);}
+}
 .genie-title{font-family:'Cinzel',serif;font-size:clamp(24px,7vw,36px);font-weight:900;color:#fff;letter-spacing:.06em;text-shadow:0 0 40px rgba(77,159,255,.9),0 0 80px rgba(77,159,255,.4);margin-bottom:4px;animation:title-glow 3s ease-in-out infinite alternate;}
 @keyframes title-glow{from{text-shadow:0 0 30px rgba(77,159,255,.8)}to{text-shadow:0 0 60px rgba(77,159,255,1),0 0 100px rgba(168,85,247,.5)}}
 .genie-sub{font-size:10px;color:var(--gold);letter-spacing:.28em;margin-bottom:20px;font-weight:300;}
@@ -245,8 +258,26 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
   .ans-btn{font-size:14px;padding:12px 12px;}
 }
 
+/* ===== MOBILE PERFORMANCE — تقليل الـ animations الثقيلة على الموبايل ===== */
+@media(max-width:768px){
+  /* إيقاف النجوم الكثيرة */
+  .star{animation-duration:4s !important;}
+  /* تبسيط تأثيرات الضباب */
+  .fog-layer{animation:none !important;opacity:.15 !important;}
+  /* تبسيط الجسيمات */
+  .ap{display:none !important;}
+  /* تقليل blur effects */
+  .smoke-stream{filter:blur(3px) !important;}
+  .splash-smoke-c div{filter:blur(5px) !important;}
+  /* تقليل box-shadow المعقد */
+  .lamp-body{box-shadow:0 0 30px rgba(255,201,77,.5) !important;}
+  .genie-in-lamp{filter:drop-shadow(0 0 10px rgba(77,159,255,.6)) !important;}
+  /* تفعيل will-change للعناصر المتحركة فقط */
+  .genie-game-face,.genie-svg-wrap,.splash-genie{will-change:transform;}
+}
+
 /* ===== SPLASH SCREEN ===== */
-#splash-screen{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+#splash-screen{position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding-top:env(safe-area-inset-top,0px);}
 #splash-screen.fade-out{animation:splash-fade 1s ease forwards;}
 @keyframes splash-fade{to{opacity:0;pointer-events:none}}
 .splash-lamp-wrap{position:relative;width:200px;height:260px;display:flex;align-items:flex-end;justify-content:center;}
@@ -572,7 +603,7 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif
   <div id="screen-intro">
     <!-- Lamp with genie inside -->
     <div class="lamp-scene">
-      <div style="position:relative;margin-bottom:30px;">
+      <div style="position:relative;margin-bottom:30px;padding-top:100px;">
         <div class="smoke-container" style="position:absolute;top:-100px;left:50%;transform:translateX(-50%);">
           <div class="smoke-stream"></div>
           <div class="smoke-stream"></div>
@@ -811,7 +842,9 @@ function updateGenieFace(mood){
 //  STARS + SHOOTING STARS
 // ============================================================
 const starsEl=document.getElementById('stars');
-for(let i=0;i<110;i++){
+const isMobile=window.innerWidth<=768;
+const starCount=isMobile?40:110;
+for(let i=0;i<starCount;i++){
   const s=document.createElement('div');s.className='star';
   const sz=Math.random()*2.6+.3;
   s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*6}s;animation-delay:${Math.random()*6}s;opacity:${Math.random()*.6+.1}`;
@@ -834,7 +867,7 @@ function spawnAP(){
   p.style.cssText=`width:${sz}px;height:${sz}px;left:${left}%;bottom:60px;--dur:${dur}s;background:${cols[0|Math.random()*5]};animation-delay:${Math.random()*2}s;filter:blur(1.5px)`;
   document.body.appendChild(p);setTimeout(()=>p.remove(),(dur+3)*1000);
 }
-setInterval(spawnAP,1100);
+if(!isMobile) setInterval(spawnAP,1100);
 
 // ============================================================
 //  QR CODE
@@ -982,47 +1015,47 @@ const DEPTS=[
 //  QUESTIONS BANK (28 سؤال — 7 مباشرة + 7 غير مباشرة + 7 ذكية + 7 محايدة)
 // ============================================================
 const ALL_QUESTIONS=[
-  /* === أمن سيبراني — مباشرة === */
-  {q:'لو اكتشفت إن حسابك على موقع اتُخترق — هل تبدأ تحلل كيف صار الاختراق بدلاً ما تغير كلمة السر وتنسى؟',w:[{cyber:5},{cyber:1,net:1},{cyber:2,ice:1},{net:1,ai:1},{ice:1}]},
-  {q:'هل تجذبك فكرة اختبار الاختراق — يعني تحاول تكسر الأنظمة بطريقة قانونية لتحسينها؟',w:[{cyber:5},{cyber:1,ai:1},{cyber:2,net:1},{ai:1,net:1},{ice:1}]},
-  {q:'هل تهتم بقراءة أخبار الثغرات الأمنية (CVE) واختراقات الشركات الكبيرة؟',w:[{cyber:5},{cyber:1,net:1},{cyber:2,ice:1},{net:1,ai:1},{ai:1}]},
+  /* === أمن سيبراني === */
+  {q:'هل تحب فكرة حماية المعلومات ومنع الهاكرز من الوصول إلى الأنظمة؟',w:[{cyber:5},{cyber:1,net:1},{cyber:2,ice:1},{net:1,ai:1},{ice:1}]},
+  {q:'هل تهتم بكيفية حماية كلمات المرور والبيانات الشخصية على الإنترنت؟',w:[{cyber:5},{ai:1,net:1},{cyber:2,ice:1},{net:1,ai:1},{ai:1}]},
+  {q:'لو أخبرك أحد إن هناك طريقة لاكتشاف إذا اتُخترق جهازك — هل تريد تتعلمها؟',w:[{cyber:5},{cyber:1,net:1},{cyber:2,ice:1},{net:1,ai:1},{ice:1}]},
 
-  /* === ذكاء اصطناعي — مباشرة === */
-  {q:'هل تحلم ببناء برنامج يتعلم ويتطور لوحده ويتخذ قرارات أذكى مع كل بيانات جديدة؟',w:[{ai:5},{net:1,ice:1},{ai:2,ice:1},{cyber:1,net:1},{ice:1}]},
-  {q:'هل تعجبك الروبوتات والأنظمة الذكية الآلية مثل السيارات ذاتية القيادة؟',w:[{ai:5,ice:1},{net:1,cyber:1},{ai:2,net:1},{cyber:1,ice:1},{net:1}]},
-  {q:'لو أعطيتك مجموعة بيانات ضخمة — هل أول فكرة تجي في بالك: كيف أدرّب نموذج ذكاء اصطناعي عليها؟',w:[{ai:5},{ice:1,net:1},{ai:2,cyber:1},{cyber:1,net:1},{net:1}]},
+  /* === ذكاء اصطناعي === */
+  {q:'هل تعجبك فكرة برامج تتعلم لوحدها وتصير أذكى مع مرور الوقت؟',w:[{ai:5},{net:1,ice:1},{ai:2,ice:1},{cyber:1,net:1},{ice:1}]},
+  {q:'هل تحلم ببرمجة روبوت أو سيارة ذاتية القيادة في المستقبل؟',w:[{ai:5,ice:1},{net:1,cyber:1},{ai:2,net:1},{cyber:1,ice:1},{net:1}]},
+  {q:'هل تجذبك أدوات مثل ChatGPT وكيف تعمل من الداخل؟',w:[{ai:5},{ice:1,net:1},{ai:2,cyber:1},{cyber:1,net:1},{net:1}]},
 
-  /* === شبكات — مباشرة === */
-  {q:'لو انقطع الإنترنت فجأة — هل أول شيء تفكر فيه هو تشخيص المشكلة من الراوتر بنفسك؟',w:[{net:5},{ai:1,cyber:1},{net:2,ice:1},{ice:1,ai:1},{cyber:1}]},
-  {q:'هل تهتم بتصميم شبكات الشركات الكبيرة — كيف تربط مئات الأجهزة والسيرفرات ببعض؟',w:[{net:5},{ai:1,ice:1},{net:2,cyber:1},{cyber:1,ice:1},{ai:1}]},
-  {q:'هل تعرف الفرق بين TCP و UDP و BGP وتجد هذا الموضوع ممتعاً؟',w:[{net:5},{ice:1,cyber:1},{net:2,ai:1},{ai:1,cyber:1},{ice:1}]},
+  /* === شبكات === */
+  {q:'هل تريد تتعلم كيف يتصل الإنترنت بين ملايين الأجهزة حول العالم؟',w:[{net:5},{ai:1,cyber:1},{net:2,ice:1},{ice:1,ai:1},{cyber:1}]},
+  {q:'لو توقف الإنترنت في البيت — هل تحاول تحل المشكلة بنفسك من الراوتر؟',w:[{net:5},{ai:1,ice:1},{net:2,cyber:1},{cyber:1,ice:1},{ai:1}]},
+  {q:'هل يثيرك موضوع كيف تتواصل الأجهزة مع بعضها في شبكات الشركات والمستشفيات؟',w:[{net:5},{ice:1,cyber:1},{net:2,ai:1},{ai:1,cyber:1},{ice:1}]},
 
-  /* === اتصالات — مباشرة === */
-  {q:'هل يستهويك كيف تنتقل الإشارات والبيانات عبر الهواء والكابلات مثل شبكات 5G والألياف الضوئية؟',w:[{ice:5,net:1},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,ai:1},{net:1}]},
-  {q:'هل تفضل العمل في مجال الاتصالات مثل Zain أو Asiacell على مجال الأمن أو البرمجة البحتة؟',w:[{ice:5,net:1},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,net:1},{ai:1}]},
-  {q:'هل يثيرك معالجة الإشارات الرقمية — كيف تُشفَّر وتُضغط الصوت والصورة في الاتصالات؟',w:[{ice:5},{ai:1,net:1},{ice:2,cyber:1},{cyber:1,net:1},{net:1}]},
+  /* === اتصالات === */
+  {q:'هل تهتم بكيفية إرسال واستقبال الإشارات عبر الهواء مثل الموبايل والـ WiFi؟',w:[{ice:5,net:1},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,ai:1},{net:1}]},
+  {q:'هل تعجبك تقنية الـ 5G وكيف تنقل البيانات بسرعة هائلة؟',w:[{ice:5,net:1},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,net:1},{ai:1}]},
+  {q:'هل تريد تتعلم كيف تصل مكالمة الموبايل من شخص لآخر بثوانٍ؟',w:[{ice:5},{ai:1,net:1},{ice:2,cyber:1},{cyber:1,net:1},{net:1}]},
 
-  /* === ذكية وغير مباشرة === */
-  {q:'لو صديقك أرسل لك رسالة غريبة من حسابه — ما هو أول شيء يخطر في بالك؟',w:[{cyber:5},{ai:2,net:1},{cyber:2,ice:1},{net:1,ai:1},{ice:1}]},
-  {q:'هل تؤمن بأن الأجهزة المنزلية الذكية (ثلاجة، مكيف، تلفاز) يجب أن تتواصل وتتعلم من عاداتك؟',w:[{ai:4,ice:1},{net:1,cyber:1},{ai:2,net:1},{cyber:2,ice:1},{net:1}]},
-  {q:'عندما تشاهد فيلم خيال علمي، هل تفكر كيف يمكن تحقيق التقنية المعروضة فعلياً؟',w:[{ai:3,ice:2},{net:2,cyber:1},{ai:1,net:1,ice:1},{cyber:1,net:1},{ice:1}]},
-  {q:'هل تعتقد إن الخصوصية الرقمية هي حق أساسي يجب الدفاع عنه بكل الطرق التقنية؟',w:[{cyber:4,ice:1},{ai:1,net:1},{cyber:2,net:1},{net:1,ai:1},{ai:1}]},
-  {q:'لو بنيت تطبيق — هل أول سؤال يخطر ببالك هو: كيف أحمي بيانات المستخدمين؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ice:1}]},
-  {q:'هل تحب تتابع أخبار شركات الاتصالات والمنافسة بينها على أسرع شبكة؟',w:[{ice:4,net:2},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,ai:1},{net:1}]},
-  {q:'هل تفكر في مستقبل يعمل فيه كل شيء تلقائياً — المصانع، المستشفيات، حتى الزراعة؟',w:[{ai:4,ice:1},{net:2,cyber:1},{ai:2,net:1},{cyber:1,ice:1},{ice:1}]},
-  {q:'هل تجد أن المشاكل المعقدة تُحل بشكل أفضل بالتحليل المنطقي والخوارزميات؟',w:[{ai:3,cyber:2},{net:1,ice:1},{ai:1,cyber:1,net:1},{net:1,ice:1},{ice:1}]},
+  /* === أسئلة ذكية وبسيطة === */
+  {q:'لو جاءتك رسالة من صديقك تطلب منك تضغط على رابط — هل تشك فيها أولاً قبل ما تفتحها؟',w:[{cyber:5},{ai:2,net:1},{cyber:2,ice:1},{net:1,ai:1},{ice:1}]},
+  {q:'هل تحب فكرة المنازل الذكية — مثل إضاءة تشتغل لوحدها وثلاجة تطلب البقالة؟',w:[{ai:4,ice:1},{net:1,cyber:1},{ai:2,net:1},{cyber:2,ice:1},{net:1}]},
+  {q:'هل تشاهد أفلام الخيال العلمي وتتمنى تصنع التقنيات اللي فيها؟',w:[{ai:3,ice:2},{net:2,cyber:1},{ai:1,net:1,ice:1},{cyber:1,net:1},{ice:1}]},
+  {q:'هل تؤمن بأن خصوصيتك على الإنترنت مهمة ويجب حمايتها؟',w:[{cyber:4,ice:1},{ai:1,net:1},{cyber:2,net:1},{net:1,ai:1},{ai:1}]},
+  {q:'لو صممت تطبيق — هل أول شيء يخطر ببالك كيف تحمي بيانات المستخدمين؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ice:1}]},
+  {q:'هل تتابع أخبار شركات الاتصالات وتنافسها على أسرع شبكة؟',w:[{ice:4,net:2},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,ai:1},{net:1}]},
+  {q:'هل تتخيل مستقبلاً تعمل فيه المصانع والمستشفيات تلقائياً بدون تدخل بشري؟',w:[{ai:4,ice:1},{net:2,cyber:1},{ai:2,net:1},{cyber:1,ice:1},{ice:1}]},
+  {q:'هل تحب تحل الألغاز والمسائل المنطقية أكثر من الحفظ؟',w:[{ai:3,cyber:2},{net:1,ice:1},{ai:1,cyber:1,net:1},{net:1,ice:1},{ice:1}]},
 
-  /* === محايدة/شخصية تكشف الشخصية === */
-  {q:'لو كنت في مباراة فيديو واتُخترق حسابك — كيف ستتصرف؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ice:1}]},
-  {q:'هل تفضل البرمجة التي تحل مشاكل حقيقية ومرئية على الناس بدلاً من البرمجة النظرية؟',w:[{ai:2,ice:2,net:1},{cyber:1,net:1},{ai:1,net:1,ice:1},{cyber:1,ai:1},{net:1}]},
-  {q:'إذا كنت مسافراً وانقطع اتصال رحلتك — هل تفكر في البنية التحتية للاتصالات خلف هذه المشكلة؟',w:[{ice:4,net:2},{ai:1,cyber:1},{ice:1,net:2},{cyber:1,ai:1},{net:1}]},
-  {q:'هل تستمتع بتحليل الأنماط في البيانات والبحث عن معلومات مخفية داخلها؟',w:[{ai:3,cyber:2},{ice:1,net:1},{ai:1,cyber:1,net:1},{net:1,ice:1},{ice:1}]},
+  /* === محايدة وشخصية === */
+  {q:'لو اتُخترق حسابك في لعبة فيديو — هل تحاول تفهم كيف صار هذا؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ice:1}]},
+  {q:'هل تفضل البرمجة التي تحل مشاكل حياتية ملموسة للناس؟',w:[{ai:2,ice:2,net:1},{cyber:1,net:1},{ai:1,net:1,ice:1},{cyber:1,ai:1},{net:1}]},
+  {q:'لو انقطع اتصال رحلتك في المطار — هل تتساءل عن البنية التحتية خلف هذه المشكلة؟',w:[{ice:4,net:2},{ai:1,cyber:1},{ice:1,net:2},{cyber:1,ai:1},{net:1}]},
+  {q:'هل تحب تبحث عن أنماط وتفاصيل مخفية في البيانات والأرقام؟',w:[{ai:3,cyber:2},{ice:1,net:1},{ai:1,cyber:1,net:1},{net:1,ice:1},{ice:1}]},
 
-  /* === سؤالان ليس لهما علاقة بالتخصص — لكنها تحسس بالأهمية === */
-  {q:'في الصباح، هل أنت من النوع اللي يخطط ليومه بدقة أم يترك الأمور تسير؟',w:[{cyber:2,net:1},{ai:2,ice:1},{cyber:1,ai:1,net:1},{net:1,ice:1},{ice:1}]},
-  {q:'هل تفضل العمل ضمن فريق يكمل بعضه أم تفضل مشاريع تنجزها لوحدك؟',w:[{net:2,ice:1},{ai:2,cyber:1},{ai:1,cyber:1,net:1},{ice:1,net:1},{cyber:1}]},
-  {q:'إذا اكتشفت خطأً في نظام عام يؤثر على الناس — هل ستبلغ عنه فوراً حتى لو لم يطلب منك أحد؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ai:1}]},
-  {q:'ما الذي يحمسك أكثر: اكتشاف شيء جديد لم يكتشفه أحد، أم تحسين شيء موجود ليعمل بشكل مثالي؟',w:[{ai:2,cyber:2},{net:1,ice:2},{ai:1,cyber:1,ice:1},{net:1,cyber:1},{ice:1}]},
+  /* === أسئلة شخصية === */
+  {q:'في الصباح، هل تفضل تخطط يومك بدقة أم تتركه يجري؟',w:[{cyber:2,net:1},{ai:2,ice:1},{cyber:1,ai:1,net:1},{net:1,ice:1},{ice:1}]},
+  {q:'هل تفضل العمل بفريق أم تنجز مشاريعك بنفسك؟',w:[{net:2,ice:1},{ai:2,cyber:1},{ai:1,cyber:1,net:1},{ice:1,net:1},{cyber:1}]},
+  {q:'لو اكتشفت خطأً في موقع حكومي يؤثر على الناس — هل تبلغ عنه فوراً؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ai:1}]},
+  {q:'ما الذي يحمسك أكثر: اكتشاف شيء جديد كلياً، أم تطوير شيء موجود ليصير أفضل؟',w:[{ai:2,cyber:2},{net:1,ice:2},{ai:1,cyber:1,ice:1},{net:1,cyber:1},{ice:1}]},
 ];
 
 // أوزان الإجابات للخيارات الخمسة: نعم / لا / من الممكن / أنا لا أعلم / أفضل عدم الإجابة
