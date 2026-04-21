@@ -7,7 +7,22 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>المارد الأزرق — يحزر قسمك</title>
+<!-- preconnect لتسريع تحميل الخطوط -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- تحميل الخطوط مع display=swap لمنع FOIT على iOS -->
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* خط احتياطي عربي مضمّن — يشتغل بدون إنترنت وعلى iOS فوراً */
+@font-face {
+  font-family: 'Tajawal';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Tajawal'), local('Tajawal-Regular');
+  unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFF;
+}
+</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -16,7 +31,7 @@
   --smoke:#a0b4d0;--card:#070c1a;--border:#0d1a35;--text:#c8d8f0;
   --green:#22c55e;--red:#ef4444;--purple:#a855f7;--cyan:#06b6d4;
 }
-html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal',sans-serif;color:var(--text);overflow-x:clip;-webkit-font-smoothing:antialiased;}
+html,body{background:var(--bg);min-height:100vh;font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK','-apple-system','Helvetica Neue',sans-serif;color:var(--text);overflow-x:clip;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;}
 html{overflow-y:auto;}
 body{overflow-y:auto;}
 
@@ -99,7 +114,7 @@ body{overflow-y:auto;}
 .qr-box h3{font-size:17px;font-weight:700;color:#fff;margin-bottom:5px;}
 .qr-box p{font-size:12px;color:var(--smoke);margin-bottom:16px;}
 #qrcode{display:flex;justify-content:center;background:#fff;border-radius:10px;padding:10px;margin:0 auto 16px;width:fit-content;}
-.qr-close{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;padding:11px 32px;border-radius:50px;cursor:pointer;transition:all .3s;}
+.qr-close{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif;font-size:14px;font-weight:700;padding:11px 32px;border-radius:50px;cursor:pointer;transition:all .3s;}
 
 /* ===== CONTAINER ===== */
 .container{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 120px;max-width:480px;margin:0 auto;padding-top:max(env(safe-area-inset-top,0px),60px);}
@@ -129,7 +144,7 @@ body{padding-top:env(safe-area-inset-top,0px);}
 .dept-chip:nth-child(4){animation-delay:.4s}
 @keyframes chip-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .dept-chip:hover{border-color:var(--blue);color:#fff;transform:scale(1.03);}
-.start-btn{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:18px;font-weight:700;padding:17px 0;border-radius:50px;cursor:pointer;box-shadow:0 0 50px rgba(37,99,255,.5);transition:all .3s;width:100%;max-width:280px;position:relative;overflow:hidden;animation:btn-glow 2.5s ease-in-out infinite alternate;}
+.start-btn{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif;font-size:18px;font-weight:700;padding:17px 0;border-radius:50px;cursor:pointer;box-shadow:0 0 50px rgba(37,99,255,.5);transition:all .3s;width:100%;max-width:280px;position:relative;overflow:hidden;animation:btn-glow 2.5s ease-in-out infinite alternate;}
 @keyframes btn-glow{from{box-shadow:0 0 30px rgba(37,99,255,.4)}to{box-shadow:0 0 70px rgba(37,99,255,.8),0 0 140px rgba(37,99,255,.3)}}
 .start-btn::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent,rgba(255,255,255,.1),transparent);animation:shine 2.5s ease-in-out infinite;}
 @keyframes shine{0%{transform:translateX(-100%) rotate(45deg)}60%,100%{transform:translateX(100%) rotate(45deg)}}
@@ -165,7 +180,7 @@ body{padding-top:env(safe-area-inset-top,0px);}
 
 /* Answer buttons */
 .answers{display:flex;flex-direction:column;gap:10px;}
-.ans-btn{background:rgba(255,255,255,.03);border:2px solid;color:#fff;font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;padding:14px 16px;border-radius:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;text-align:right;width:100%;}
+.ans-btn{background:rgba(255,255,255,.03);border:2px solid;color:#fff;font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif;font-size:15px;font-weight:700;padding:14px 16px;border-radius:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;text-align:right;width:100%;}
 .ans-btn:active{transform:scale(.96);}
 .ans-btn.o1{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06);}
 .ans-btn.o1:hover,.ans-btn.o1.sel{border-color:#22c55e;background:rgba(34,197,94,.18);box-shadow:0 0 20px rgba(34,197,94,.3);}
@@ -180,7 +195,7 @@ body{padding-top:env(safe-area-inset-top,0px);}
 .ans-icon{font-size:20px;flex-shrink:0;}
 
 /* Back button */
-.back-btn{background:transparent;border:1.5px solid rgba(77,159,255,.2);color:var(--smoke);font-family:'Tajawal',sans-serif;font-size:13px;padding:9px 20px;border-radius:50px;cursor:pointer;transition:all .25s;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.back-btn{background:transparent;border:1.5px solid rgba(77,159,255,.2);color:var(--smoke);font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif;font-size:13px;padding:9px 20px;border-radius:50px;cursor:pointer;transition:all .25s;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
 .back-btn:hover{border-color:var(--blue);color:#fff;}
 
 /* Fun phrase in game */
@@ -220,9 +235,9 @@ body{padding-top:env(safe-area-inset-top,0px);}
 .confidence-bar{flex:1;height:7px;background:var(--border);border-radius:7px;overflow:hidden;}
 .confidence-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--glow),var(--gold));border-radius:7px;width:0;transition:width 1.6s cubic-bezier(.22,1,.36,1);box-shadow:0 0 12px rgba(77,159,255,.6);}
 .confidence-pct{font-size:12px;color:var(--glow);font-weight:700;white-space:nowrap;}
-.wrong-btn{background:transparent;border:1.5px solid rgba(239,68,68,.35);color:rgba(239,68,68,.8);font-family:'Tajawal',sans-serif;font-size:14px;padding:11px 0;border-radius:50px;cursor:pointer;transition:all .3s;margin-bottom:10px;width:100%;animation:fadeUp .7s .5s ease both;}
+.wrong-btn{background:transparent;border:1.5px solid rgba(239,68,68,.35);color:rgba(239,68,68,.8);font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif;font-size:14px;padding:11px 0;border-radius:50px;cursor:pointer;transition:all .3s;margin-bottom:10px;width:100%;animation:fadeUp .7s .5s ease both;}
 .wrong-btn:hover{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,.06);}
-.replay-btn{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal',sans-serif;font-size:16px;font-weight:700;padding:15px 0;border-radius:50px;cursor:pointer;box-shadow:0 0 35px rgba(37,99,255,.4);transition:all .3s;width:100%;animation:fadeUp .7s .6s ease both;}
+.replay-btn{background:linear-gradient(135deg,var(--blue),#1d4ed8);border:none;color:#fff;font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif;font-size:16px;font-weight:700;padding:15px 0;border-radius:50px;cursor:pointer;box-shadow:0 0 35px rgba(37,99,255,.4);transition:all .3s;width:100%;animation:fadeUp .7s .6s ease both;}
 .replay-btn:hover{transform:scale(1.03);}
 .replay-btn:active{transform:scale(.97);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
@@ -232,7 +247,7 @@ body{padding-top:env(safe-area-inset-top,0px);}
 .wrong-genie{font-size:70px;margin-bottom:12px;animation:shake .5s ease both;}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-14px)}40%{transform:translateX(14px)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
 .dept-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0;}
-.dept-choice-btn{background:var(--card);border:2px solid var(--border);color:var(--text);font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;padding:14px 10px;border-radius:14px;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.dept-choice-btn{background:var(--card);border:2px solid var(--border);color:var(--text);font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif;font-size:13px;font-weight:700;padding:14px 10px;border-radius:14px;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:7px;}
 .dept-choice-btn:hover{border-color:var(--gold);color:var(--gold);transform:scale(1.05);}
 .dept-choice-btn .d-icon{font-size:26px;}
 .dept-choice-btn .d-name{font-size:12px;line-height:1.4;text-align:center;}
@@ -309,6 +324,41 @@ body{padding-top:env(safe-area-inset-top,0px);}
 .genie-svg-wrap .gv-mouth,
 .genie-svg-wrap .gv-eye-l,
 .genie-svg-wrap .gv-eye-r{transition:d .4s ease,transform .4s ease;}
+
+/* ===== iOS Arabic Text Fix ===== */
+*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+
+/* منع تقطع الكلمات العربية */
+p,span,div,button,h1,h2,h3,h4{
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  -webkit-hyphens:none;
+  hyphens:none;
+}
+
+/* تثبيت اتجاه النص وضمان وصل الحروف */
+.speech-bubble p,.question-text,.result-speech,
+.ans-btn,.dept-chip,.genie-feeling-bubble,
+.fun-phrase-game,.result-dept,.wrong-genie+*{
+  direction:rtl;
+  unicode-bidi:plaintext;
+  font-feature-settings:"kern" 1,"liga" 1,"calt" 1;
+  -webkit-font-feature-settings:"kern" 1,"liga" 1,"calt" 1;
+}
+
+/* iOS فقط — @supports للـ touch-callout الخاص بـ Safari */
+@supports (-webkit-touch-callout:none){
+  html,body,button,p,span,div{
+    font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif !important;
+  }
+  .speech-bubble p,.question-text,.result-speech,.ans-btn,.genie-feeling-bubble{
+    letter-spacing:0 !important;
+    word-spacing:0.04em;
+    line-height:1.9;
+  }
+  /* منع iOS من تصغير الخط تلقائياً */
+  body{-webkit-text-size-adjust:100% !important;}
+}
 </style>
 </head>
 <body>
@@ -1185,58 +1235,59 @@ const DEPTS=[
 //  QUESTIONS BANK (28 سؤال — 7 مباشرة + 7 غير مباشرة + 7 ذكية + 7 محايدة)
 // ============================================================
 const ALL_QUESTIONS=[
-  /* === أمن سيبراني === */
-  {q:'هل تحب فكرة حماية المعلومات ومنع الهاكرز من الوصول إلى الأنظمة؟',w:[{cyber:5},{cyber:1,net:1},{cyber:2,ice:1},{net:1,ai:1},{ice:1}]},
-  {q:'هل تهتم بكيفية حماية كلمات المرور والبيانات الشخصية على الإنترنت؟',w:[{cyber:5},{ai:1,net:1},{cyber:2,ice:1},{net:1,ai:1},{ai:1}]},
-  {q:'لو أخبرك أحد إن هناك طريقة لاكتشاف إذا اخترق جهازك — هل تريد تتعلمها؟',w:[{cyber:5},{cyber:1,net:1},{cyber:2,ice:1},{net:1,ai:1},{ice:1}]},
 
-  /* === ذكاء اصطناعي === */
-  {q:'هل تعجبك فكرة برامج تتعلم لوحدها وتصير أذكى مع مرور الوقت؟',w:[{ai:5},{net:1,ice:1},{ai:2,ice:1},{cyber:1,net:1},{ice:1}]},
-  {q:'هل تحلم ببرمجة روبوت أو سيارة ذاتية القيادة في المستقبل؟',w:[{ai:5,ice:1},{net:1,cyber:1},{ai:2,net:1},{cyber:1,ice:1},{net:1}]},
-  {q:'هل تجذبك أدوات مثل ChatGPT وكيف تعمل من الداخل؟',w:[{ai:5},{ice:1,net:1},{ai:2,cyber:1},{cyber:1,net:1},{net:1}]},
+  // ══ أمن سيبراني ══
+  // w[0]=نعم  w[1]=لا  w[2]=مو متأكد
+  {q:'تحب تتعلم وتعرف شلون الهكرز يخترق المواقع؟',            w:[{cyber:5},{ai:2,net:1},{cyber:2,ai:1}]},
+  {q:'تحب تحمي بيانات الناس من السرقة؟',                w:[{cyber:5},{net:2,ice:1},{cyber:2,net:1}]},
+  {q:'تحب تصير الشخص الي يوكف كل الهجمات الالكترونية ',  w:[{cyber:5},{ai:2,ice:1},{cyber:3,net:1}]},
+  {q:'تحب تكتشف الثغرات في الأنظمة قبل ما يكتشفها أحد؟',w:[{cyber:5},{net:1,ai:1},{cyber:3,ice:1}]},
+  {q:'قسمك يعلمك شلون تحمي بياناتك الشخصية على الانترنت ؟',  w:[{cyber:4,net:1},{ai:2,ice:1},{cyber:2,net:1}]},
+  {q:'تحب تشتغل في حماية البنوك والشركات من الاختراق وتحميها الكترونيا؟',    w:[{cyber:5},{net:2,ai:1},{cyber:3,ice:1}]},
+  {q:'تتحمس لو كالولك "اكو ثغرة في هذا الموقع — تكدر تلكيها"؟', w:[{cyber:5},{ice:2,ai:1},{cyber:3,net:1}]},
 
-  /* === شبكات === */
-  {q:'هل تريد تتعلم كيف يتصل الإنترنت بين ملايين الأجهزة حول العالم؟',w:[{net:5},{ai:1,cyber:1},{net:2,ice:1},{ice:1,ai:1},{cyber:1}]},
-  {q:'لو توقف الإنترنت في البيت — هل تحاول تحل المشكلة بنفسك من الراوتر؟',w:[{net:5},{ai:1,ice:1},{net:2,cyber:1},{cyber:1,ice:1},{ai:1}]},
-  {q:'هل يثيرك موضوع كيف تتواصل الأجهزة مع بعضها في شبكات الشركات والمستشفيات؟',w:[{net:5},{ice:1,cyber:1},{net:2,ai:1},{ai:1,cyber:1},{ice:1}]},
+  // ══ ذكاء اصطناعي ══
+  {q:'تحب الروبوتات وتتمنى تبرمجها؟',                   w:[{ai:5},{net:2,ice:1},{ai:3,ice:1}]},
+  {q:'تعجبك فكرة إن تصمم بالمستقبل برنامج يفكر وينفذ العمل لوحده؟',             w:[{ai:5},{cyber:1,net:1},{ai:3,net:1}]},
+  {q:'تحلم تصنع برنامج ذكي يحل مشاكل بدون تدخل بشري؟',  w:[{ai:5},{ice:2,net:1},{ai:3,cyber:1}]},
+  {q:'قسمك مهتم بادوات الذكاء الاصطناعي المشهورة مثل ChatGPT؟',     w:[{ai:5},{cyber:2,net:1},{ai:3,ice:1}]},
+  {q:'هل تشعر بالحماس عند فهم كيفية عمل الذكاء الاصطناعي؟',              w:[{ai:5,ice:1},{cyber:1,net:1},{ai:3,net:1}]},
+  {q:'هل تشعر بالحماس عند بناء نموذج قوي يحل مشاكل معقدة؟',     w:[{ai:4,cyber:1},{net:2,ice:1},{ai:2,net:1}]},
+  {q:'تحس بالفضول وتريد تعرف الروبوتات شلون تتعلم؟',   w:[{ai:5},{ice:2,cyber:1},{ai:3,net:1}]},
 
-  /* === اتصالات === */
-  {q:'هل تهتم بكيفية إرسال واستقبال الإشارات عبر الهواء مثل الموبايل والـ WiFi؟',w:[{ice:5,net:1},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,ai:1},{net:1}]},
-  {q:'هل تعجبك تقنية الـ 5G وكيف تنقل البيانات بسرعة هائلة؟',w:[{ice:5,net:1},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,net:1},{ai:1}]},
-  {q:'هل تريد تتعلم كيف تصل مكالمة الموبايل من شخص لآخر بثوانٍ؟',w:[{ice:5},{ai:1,net:1},{ice:2,cyber:1},{cyber:1,net:1},{net:1}]},
+  // ══ شبكات ══
+  {q:'تحب تفهم كيف يوصلك الإنترنت بالعالم كله؟',        w:[{net:5},{ai:2,cyber:1},{net:3,ice:1}]},
+  {q:'لو انقطع الانترنت في البيت قسمك يعلمك شلون تحل المشكلة بنفسك؟',          w:[{net:5},{ai:1,ice:1},{net:3,cyber:1}]},
+  {q:'تريد تشتغل في ربط شبكات الشركات والمستشفيات؟',     w:[{net:5},{cyber:2,ai:1},{net:3,ice:1}]},
+  {q:'تحب تعرف شلون تحجي الأجهزة مع بعضها عبر الشبكة؟',  w:[{net:5,ice:1},{ai:2,cyber:1},{net:3,ice:1}]},
+  {q:'يعجبك موضوع إعداد الراوترات والسويتشات؟',          w:[{net:5},{ice:2,ai:1},{net:3,cyber:1}]},
+  {q:'تميل لتعلم بروتوكولات الشبكات ؟',w:[{net:5},{cyber:1,ai:1},{net:3,ice:1}]},
 
-  /* === أسئلة ذكية وبسيطة === */
-  {q:'لو جاءتك رسالة من صديقك تطلب منك تضغط على رابط — هل تشك فيها أولاً قبل ما تفتحها؟',w:[{cyber:5},{ai:2,net:1},{cyber:2,ice:1},{net:1,ai:1},{ice:1}]},
-  {q:'هل تحب فكرة المنازل الذكية — مثل إضاءة تشتغل لوحدها وثلاجة تطلب البقالة؟',w:[{ai:4,ice:1},{net:1,cyber:1},{ai:2,net:1},{cyber:2,ice:1},{net:1}]},
-  {q:'هل تشاهد أفلام الخيال العلمي وتتمنى تصنع التقنيات اللي فيها؟',w:[{ai:3,ice:2},{net:2,cyber:1},{ai:1,net:1,ice:1},{cyber:1,net:1},{ice:1}]},
-  {q:'هل تؤمن بأن خصوصيتك على الإنترنت مهمة ويجب حمايتها؟',w:[{cyber:4,ice:1},{ai:1,net:1},{cyber:2,net:1},{net:1,ai:1},{ai:1}]},
-  {q:'لو صممت تطبيق — هل أول شيء يخطر ببالك كيف تحمي بيانات المستخدمين؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ice:1}]},
-  {q:'هل تتابع أخبار شركات الاتصالات وتنافسها على أسرع شبكة؟',w:[{ice:4,net:2},{ai:1,cyber:1},{ice:2,net:1},{cyber:1,ai:1},{net:1}]},
-  {q:'هل تتخيل مستقبلاً تعمل فيه المصانع والمستشفيات تلقائياً بدون تدخل بشري؟',w:[{ai:4,ice:1},{net:2,cyber:1},{ai:2,net:1},{cyber:1,ice:1},{ice:1}]},
-  {q:'هل تحب تحل الألغاز والمسائل المنطقية أكثر من الحفظ؟',w:[{ai:3,cyber:2},{net:1,ice:1},{ai:1,cyber:1,net:1},{net:1,ice:1},{ice:1}]},
+  // ══ معلومات واتصالات ══
+  {q:'تحب تعرف كيف تنتقل المكالمة من موبايلك لموبايل ثاني؟', w:[{ice:5},{ai:2,cyber:1},{ice:3,net:1}]},
+  {q:'تعجبك تقنية الـ 5G وكيف تنقل البيانات بسرعة؟',    w:[{ice:5,net:1},{ai:2,cyber:1},{ice:3,net:1}]},
+  {q:'تريد تشتغل في شركات اتصالات مثل Zain أو Asiacell؟',w:[{ice:5},{net:2,cyber:1},{ice:3,ai:1}]},
+  {q:'تحب الإشارات اللاسلكية وكيف تنتقل عبر الهواء؟',   w:[{ice:5},{ai:2,net:1},{ice:3,net:1}]},
+  {q:'يثيرك موضوع الألياف الضوئية وكيف تنقل البيانات بالضوء؟',w:[{ice:5,net:1},{ai:2,cyber:1},{ice:3,net:1}]},
+  {q:'تريد تعمل في مجال الاتصالات والأقمار الصناعية؟',    w:[{ice:5},{net:2,ai:1},{ice:3,cyber:1}]},
 
-  /* === محايدة وشخصية === */
-  {q:'لو  اخُترق حسابك في لعبة فيديو — هل تحاول تفهم كيف صار هذا؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ice:1}]},
-  {q:'هل تفضل البرمجة التي تحل مشاكل حياتية ملموسة للناس؟',w:[{ai:2,ice:2,net:1},{cyber:1,net:1},{ai:1,net:1,ice:1},{cyber:1,ai:1},{net:1}]},
-  {q:'لو انقطع اتصال رحلتك في المطار — هل تتساءل عن البنية التحتية خلف هذه المشكلة؟',w:[{ice:4,net:2},{ai:1,cyber:1},{ice:1,net:2},{cyber:1,ai:1},{net:1}]},
-  {q:'هل تحب تبحث عن أنماط وتفاصيل مخفية في البيانات والأرقام؟',w:[{ai:3,cyber:2},{ice:1,net:1},{ai:1,cyber:1,net:1},{net:1,ice:1},{ice:1}]},
-
-  /* === أسئلة شخصية === */
-  {q:'في الصباح، هل تفضل تخطط يومك بدقة أم تتركه يجري؟',w:[{cyber:2,net:1},{ai:2,ice:1},{cyber:1,ai:1,net:1},{net:1,ice:1},{ice:1}]},
-  {q:'هل تفضل العمل بفريق أم تنجز مشاريعك بنفسك؟',w:[{net:2,ice:1},{ai:2,cyber:1},{ai:1,cyber:1,net:1},{ice:1,net:1},{cyber:1}]},
-  {q:'لو اكتشفت خطأً في موقع حكومي يؤثر على الناس — هل تبلغ عنه فوراً؟',w:[{cyber:4,net:1},{ai:1,ice:1},{cyber:2,net:1},{net:1,ai:1},{ai:1}]},
-  {q:'ما الذي يحمسك أكثر: اكتشاف شيء جديد كلياً، أم تطوير شيء موجود ليصير أفضل؟',w:[{ai:2,cyber:2},{net:1,ice:2},{ai:1,cyber:1,ice:1},{net:1,cyber:1},{ice:1}]},
+  // ══ أسئلة شخصية سريعة ══
+  {q:'تفضل تشتغل خلف الكواليس وما أحد يشوف شغلك؟',    },
+  {q:'تحب الأشياء اللي تشتغل تلقائياً بدون تدخل منك؟', },
+  {q:'تفضل تتعامل مع الأجهزة أكثر من التعامل مع الناس؟',},
+  {q:'تحس إن موضوع الأمان والخصوصية يهمك أكثر من غيرك؟'},
+  {q:'تريد مستقبلك يكون في مجال التقنية الحديثة؟'},
+  {q:'تحب تعرف كيف تشتغل الأشياء من الداخل؟',           },
+  {q:'يعجبك لو قالولك "انت مسؤول عن أمان كل بيانات الشركة"؟'},
+  {q:'تحب الرياضيات والمنطق أكثر من الحفظ؟',           },
 ];
 
-// أوزان الإجابات للخيارات الخمسة: نعم / لا / من الممكن / أنا لا أعلم / أفضل عدم الإجابة
-// w[0]=نعم، w[1]=لا، w[2]=من الممكن، w[3]=لا أعلم، w[4]=عدم الإجابة
-
+// ── خيارات الإجابة — نعم / لا / مو متأكد فقط ───────────────
+// w[0]=نعم  w[1]=لا  w[2]=مو متأكد
 const OPTS=[
   {cls:'o1',icon:'✅',text:'نعم',sfx:'yes'},
   {cls:'o2',icon:'❌',text:'لا',sfx:'no'},
-  {cls:'o3',icon:'🤔',text:'من الممكن',sfx:'maybe'},
-  {cls:'o4',icon:'🤷',text:'أنا لا أعلم',sfx:'skip'},
-  {cls:'o5',icon:'🚫',text:'أفضل عدم الإجابة',sfx:'skip'},
+  {cls:'o3',icon:'🤔',text:'مو متأكد',sfx:'maybe'},
 ];
 
 const DEPT_SPEECH={
