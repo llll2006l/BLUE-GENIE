@@ -346,6 +346,27 @@ p,span,div,button,h1,h2,h3,h4{
   -webkit-font-feature-settings:"kern" 1,"liga" 1,"calt" 1;
 }
 
+/* FIX: spans داخل question-text (typewriter) لازم يتصل الخط فيها */
+.question-text span{
+  display:inline !important;
+  font-family:inherit !important;
+  font-size:inherit !important;
+  font-weight:inherit !important;
+  color:inherit !important;
+  direction:rtl;
+  unicode-bidi:plaintext;
+  /* منع iOS من فصل الحروف داخل الـ span */
+  -webkit-rtl-ordering:visual;
+  font-feature-settings:"kern" 1,"liga" 1,"calt" 1,"arab" 1;
+  -webkit-font-feature-settings:"kern" 1,"liga" 1,"calt" 1,"arab" 1;
+}
+/* الـ container يكون RTL ليشكّل الحروف صح */
+.question-text{
+  direction:rtl;
+  text-align:center;
+  unicode-bidi:isolate;
+}
+
 /* iOS فقط — @supports للـ touch-callout الخاص بـ Safari */
 @supports (-webkit-touch-callout:none){
   html,body,button,p,span,div{
@@ -355,6 +376,10 @@ p,span,div,button,h1,h2,h3,h4{
     letter-spacing:0 !important;
     word-spacing:0.04em;
     line-height:1.9;
+  }
+  .question-text span{
+    letter-spacing:0 !important;
+    font-family:'Tajawal','Geeza Pro','Arabic UI Text','KufiStandardGK',sans-serif !important;
   }
   /* منع iOS من تصغير الخط تلقائياً */
   body{-webkit-text-size-adjust:100% !important;}
@@ -1554,14 +1579,22 @@ function renderQuestion(){
 function typewriterEffect(text,el,onDone){
   clearTimeout(typewriterTimer);
   el.innerHTML='';
-  let i=0;
-  const cursor=document.createElement('span');cursor.className='typewriter-cursor';
+  // FIX iOS Arabic: write word-by-word so Safari keeps letters connected
+  // Char-by-char breaks Arabic shaping on WebKit/iOS
+  const rawWords=text.split(' ');
+  const words=rawWords.map((w,i)=>i<rawWords.length-1?w+'\u00A0':w);
+  let wi=0;
+  const cursor=document.createElement('span');
+  cursor.className='typewriter-cursor';
   el.appendChild(cursor);
   function type(){
-    if(i<text.length){
-      el.insertBefore(document.createTextNode(text[i]),cursor);
-      i++;
-      typewriterTimer=setTimeout(type,i<5?30:Math.random()*30+25);
+    if(wi<words.length){
+      const span=document.createElement('span');
+      span.textContent=words[wi];
+      span.style.cssText='display:inline;';
+      el.insertBefore(span,cursor);
+      wi++;
+      typewriterTimer=setTimeout(type,wi===1?50:100+Math.random()*100);
     }else{
       cursor.remove();
       if(onDone)onDone();
